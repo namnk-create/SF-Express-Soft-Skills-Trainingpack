@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sổ Tay Đào Tạo Kỹ Năng Mềm Chuyên Nghiệp - SF Express</title>
+<style>
+:root{
+  --sf-red:#E11B22; --sf-black:#231F20; --sf-grey:#F4F4F4; --sf-border:#E0E0E0;
+  --sf-dark-grey:#333333; --sf-light-red:#FFF5F5; --pass-green:#2E7D32; --fail-red:#C62828;
+  --info-blue:#1565C0; --info-bg:#E3F2FD;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.6; color:var(--sf-dark-grey); background:#F8F9FA; margin:0;
+  padding:clamp(8px,3vw,20px);
+}
+.container{max-width:900px;margin:0 auto;background:#FFF;padding:clamp(14px,4vw,30px);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.header{text-align:center;border-bottom:3px solid var(--sf-red);padding-bottom:16px;margin-bottom:20px;}
+.brand-logo{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;}
+.brand-logo-mark{background:var(--sf-red);color:#fff;font-weight:900;font-size:clamp(16px,4vw,20px);line-height:1;padding:7px 10px;border-radius:6px;letter-spacing:.5px;font-family:Georgia,serif;}
+.brand-logo-word{font-weight:800;font-size:clamp(14px,3.6vw,18px);letter-spacing:3px;color:var(--sf-black);}
+.brand-title{color:var(--sf-red);font-size:clamp(17px,4.6vw,24px);font-weight:800;margin:0;text-transform:uppercase;letter-spacing:.3px;line-height:1.35;}
+.brand-subtitle{color:var(--sf-black);font-size:clamp(12px,3.2vw,14px);font-weight:600;margin-top:6px;}
+/* Public stats panel: collapsible tab */
+.stats-panel{background:var(--sf-grey);border:1px solid var(--sf-border);border-radius:10px;margin-bottom:20px;overflow:hidden;}
+.stats-tab{display:flex;align-items:center;justify-content:space-between;width:100%;background:#fff;border:none;padding:14px 16px;font-size:15px;font-weight:700;color:var(--sf-black);cursor:pointer;text-align:left;}
+.stats-tab:hover{background:#FAFAFA;}
+.stats-tab-arrow{font-size:12px;color:var(--sf-dark-grey);transition:transform .2s ease;}
+.stats-tab[aria-expanded="true"] .stats-tab-arrow{transform:rotate(180deg);}
+.stats-body{padding:16px;border-top:1px solid var(--sf-border);}
+.stats-body-inner{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;}
+.stats-filter-col{display:flex;flex-direction:column;gap:8px;min-width:150px;flex:0 0 auto;}
+.stats-filter-col label{font-size:12.5px;font-weight:600;color:var(--sf-dark-grey);}
+.stats-filter-col input[type=date]{padding:8px 10px;border:1px solid var(--sf-border);border-radius:6px;font-size:13px;min-height:38px;background:#fff;width:100%;}
+.stats-filter-btns{display:flex;gap:8px;margin-top:4px;}
+.stats-filter-btns button{flex:1;border:none;border-radius:6px;padding:8px 10px;font-size:13px;font-weight:700;cursor:pointer;min-height:38px;}
+#btnStatsFilter{background:#E4E4E4;color:var(--sf-dark-grey);}
+#btnStatsFilter:hover{background:#D2D2D2;}
+#btnStatsReset{background:#fff;color:var(--sf-dark-grey);border:1px solid var(--sf-border);}
+.stats-dashboard-col{flex:1 1 240px;min-width:220px;}
+.stats-dashboard{display:flex;flex-wrap:wrap;gap:20px;align-items:center;}
+.stats-donut-wrap{position:relative;flex:0 0 auto;width:140px;height:140px;}
+.stats-donut-wrap svg{width:140px;height:140px;}
+.stats-donut-seg{cursor:pointer;transition:opacity .15s ease;}
+.stats-donut-seg:hover{opacity:.8;}
+.stats-donut-center{position:absolute;top:0;left:0;width:140px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+.stats-donut-center .stat-num{font-size:22px;font-weight:800;color:var(--sf-black);font-family:Georgia,serif;line-height:1.1;}
+.stats-donut-center .stat-label{font-size:10px;color:#666;margin-top:2px;font-weight:600;text-align:center;}
+.stats-side-tiles{display:flex;flex-direction:column;gap:6px;flex:1 1 140px;max-width:220px;}
+.stat-tile{background:#fff;border:1px solid var(--sf-border);border-radius:8px;padding:7px 12px;text-align:left;cursor:default;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.stat-tile .stat-num{font-size:15px;font-weight:800;color:var(--sf-black);font-family:Georgia,serif;order:2;}
+.stat-tile.pass .stat-num{color:var(--pass-green);}
+.stat-tile.fail .stat-num{color:var(--fail-red);}
+.stat-tile .stat-label{font-size:11px;color:#666;margin-top:0;font-weight:600;order:1;}
+.stats-tooltip{position:fixed;pointer-events:none;background:var(--sf-black);color:#fff;font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;z-index:200;display:none;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.stats-loading,.stats-empty{font-size:13px;color:#777;padding:8px 2px;}
+.stats-section-title{font-size:12px;font-weight:700;color:var(--sf-dark-grey);text-transform:uppercase;letter-spacing:.3px;margin-bottom:12px;}
+/* Kết quả theo từng kỹ năng (module) */
+.stats-modules{margin-top:18px;padding-top:16px;border-top:1px solid var(--sf-border);}
+.stats-modules-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media (min-width:560px){.stats-modules-grid{grid-template-columns:1fr 1fr;column-gap:20px;}}
+.module-stat-row{min-width:0;}
+.module-stat-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px;}
+.module-stat-label{font-size:12.5px;color:var(--sf-black);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.module-stat-pct{font-size:12.5px;font-weight:800;color:var(--sf-black);flex-shrink:0;}
+.module-stat-bar{background:var(--sf-grey);border-radius:6px;height:7px;overflow:hidden;}
+.module-stat-fill{height:100%;background:var(--pass-green);border-radius:6px;transition:width .3s ease;}
+/* Đánh giá mức độ hài lòng (sao vàng) */
+.stats-rating{margin-top:18px;padding-top:16px;border-top:1px solid var(--sf-border);}
+.stats-rating-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.stars-wrap{position:relative;display:inline-block;font-size:22px;line-height:1;letter-spacing:2px;}
+.stars-bg{color:#E0E0E0;}
+.stars-fg{position:absolute;top:0;left:0;overflow:hidden;width:var(--fill);white-space:nowrap;color:#F5A623;}
+.stats-rating-num{font-size:14px;font-weight:800;color:var(--sf-black);font-family:Georgia,serif;}
+/* Top bar: language + instructions, sticky for mobile ease */
+.top-bar{position:sticky;top:0;z-index:50;background:#FFF;padding:8px 0;margin:-14px -14px 12px -14px;padding-left:14px;padding-right:14px;border-bottom:1px solid var(--sf-border);}
+.top-bar-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;}
+/* Hamburger menu */
+.menu-wrap{position:relative;flex-shrink:0;}
+.btn-menu{background:#FFF;border:1px solid var(--sf-border);border-radius:6px;width:44px;height:44px;min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:4px;}
+.btn-menu span{display:block;width:20px;height:2.5px;background:var(--sf-black);border-radius:2px;transition:transform .2s,opacity .2s;}
+.btn-menu.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.btn-menu.open span:nth-child(2){opacity:0;}
+.btn-menu.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.dropdown-menu{display:none;position:absolute;top:52px;left:0;background:#FFF;border:1px solid var(--sf-border);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.14);min-width:260px;max-width:88vw;z-index:90;overflow:hidden;}
+.dropdown-menu.open{display:block;}
+.dropdown-menu .dm-title{padding:12px 16px 8px;font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:.4px;}
+.dropdown-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;font-weight:600;color:var(--sf-black);cursor:pointer;border-top:1px solid var(--sf-border);}
+.dropdown-item:first-of-type{border-top:none;}
+.dropdown-item .di-icon{font-size:17px;flex-shrink:0;}
+.dropdown-item.active{background:var(--sf-light-red);color:var(--sf-red);}
+.dropdown-item.disabled{color:#B0B0B0;cursor:default;}
+.dropdown-item .di-badge{margin-left:auto;font-size:10px;font-weight:800;background:#EEE;color:#888;padding:3px 8px;border-radius:10px;text-transform:uppercase;flex-shrink:0;}
+.menu-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:80;}
+.menu-backdrop.open{display:block;}
+.lang-switcher{display:flex;gap:6px;flex-wrap:wrap;}
+.lang-btn{background:#FFF;border:1px solid var(--sf-border);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;min-height:40px;}
+.lang-btn:hover,.lang-btn.active{background:var(--sf-red);color:#FFF;border-color:var(--sf-red);}
+.btn-instructions{background:var(--info-bg);color:var(--info-blue);border:1px solid #90CAF9;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;min-height:40px;white-space:nowrap;}
+.btn-instructions:hover{background:#BBDEFB;}
+/* Info card / form */
+.info-card{background:var(--sf-grey);padding:18px;border-radius:6px;margin-bottom:24px;border-left:4px solid var(--sf-black);}
+.info-card h3{margin-top:0;color:var(--sf-black);font-size:15px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-weight:600;margin-bottom:5px;font-size:14px;}
+.form-group input{width:100%;padding:12px;border:1px solid var(--sf-border);border-radius:4px;font-size:16px;min-height:44px;}
+/* Module accordion */
+.module-card{border:1px solid var(--sf-border);border-radius:8px;margin-top:18px;overflow:hidden;}
+.module-header{background:#FFF;color:var(--sf-black);border-left:4px solid var(--sf-red);border-bottom:1px solid var(--sf-border);padding:14px 16px;font-size:clamp(13px,3.6vw,16px);font-weight:700;text-transform:uppercase;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:48px;user-select:none;transition:background .15s;}
+.module-header:hover{background:var(--sf-grey);}
+.module-header .chevron{transition:transform .2s;font-size:14px;flex-shrink:0;color:var(--sf-dark-grey);}
+.module-header.open .chevron{transform:rotate(180deg);}
+.module-body{padding:16px;display:none;}
+.module-body.open{display:block;}
+.section-title{color:var(--sf-black);border-bottom:2px solid var(--sf-grey);padding-bottom:5px;margin-top:20px;font-size:clamp(13px,3.4vw,15px);}
+ul.content-list{padding-left:20px;margin:10px 0;}
+ul.content-list li{margin-bottom:8px;font-size:clamp(13px,3.2vw,14px);}
+/* Theory / citation boxes */
+.theory-box{background:var(--info-bg);border:1px solid #90CAF9;border-left:4px solid var(--info-blue);border-radius:6px;padding:14px;margin:14px 0;font-size:clamp(13px,3.2vw,14px);}
+.theory-box .tb-title{font-weight:800;color:var(--info-blue);margin-bottom:6px;font-size:clamp(12.5px,3.2vw,13.5px);text-transform:uppercase;}
+.theory-box .tb-source{margin-top:8px;font-size:12px;color:#555;font-style:italic;}
+.case-box{background:#FFF8E1;border:1px solid #FFE082;border-left:4px solid #F9A825;border-radius:6px;padding:14px;margin:14px 0;font-size:clamp(13px,3.2vw,14px);}
+.case-box .cb-title{font-weight:800;color:#8D6E00;margin-bottom:6px;font-size:clamp(12.5px,3.2vw,13.5px);text-transform:uppercase;}
+/* Responsive tables -> stacked cards on mobile */
+.table-wrap{width:100%;overflow-x:auto;margin:14px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:480px;}
+th,td{border:1px solid var(--sf-border);padding:10px 12px;text-align:left;vertical-align:top;}
+th{background:var(--sf-grey);color:var(--sf-black);font-weight:700;}
+th.dos{background:#E8F5E9;color:#2E7D32;}
+th.donts{background:#FFEBEE;color:#C62828;}
+@media (max-width:620px){
+  table.stack, table.stack thead{display:none;}
+  table.stack, table.stack tbody, table.stack tr, table.stack td{display:block;width:100%;min-width:0;}
+  table.stack{min-width:0;}
+  table.stack tr{border:1px solid var(--sf-border);border-radius:6px;margin-bottom:10px;overflow:hidden;}
+  table.stack td{border:none;border-bottom:1px solid var(--sf-border);padding:10px 12px;}
+  table.stack td:last-child{border-bottom:none;}
+  table.stack td::before{content:attr(data-label);display:block;font-weight:700;color:var(--sf-dark-grey);font-size:11.5px;text-transform:uppercase;margin-bottom:4px;}
+  .table-wrap{overflow-x:visible;}
+}
+/* Checklist */
+.checklist-box{background:#FAFAFA;border:1px solid var(--sf-border);padding:14px;border-radius:6px;margin:14px 0;}
+.checklist-box div{margin-bottom:8px;font-size:clamp(13px,3.2vw,14px);}
+/* Flashcards */
+.flashcards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0;}
+@media (max-width:620px){.flashcards-grid{grid-template-columns:1fr;}}
+.card-container{perspective:1000px;min-height:110px;cursor:pointer;}
+.card{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,.1);}
+.card.flipped{transform:rotateY(180deg);}
+.card-face{position:absolute;width:100%;height:100%;min-height:110px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:14px;border-radius:6px;font-size:13px;text-align:center;}
+.card-front{background:#FFF;border:1px solid var(--sf-border);color:var(--sf-black);font-weight:600;}
+.card-back{background:var(--sf-light-red);border:1px solid var(--sf-red);color:var(--sf-dark-grey);transform:rotateY(180deg);}
+/* Quiz */
+.quiz-start-banner{text-align:center;background:var(--sf-grey);padding:26px 16px;border-radius:8px;border:2px dashed var(--sf-dark-grey);margin-top:30px;}
+.btn-start{background:var(--sf-red);color:#FFF;border:none;padding:15px 30px;font-size:clamp(14px,4vw,18px);font-weight:800;border-radius:6px;cursor:pointer;box-shadow:0 4px 10px rgba(225,27,34,.3);width:100%;max-width:420px;min-height:52px;}
+.btn-start:hover{background:#C11319;}
+#quiz-section{display:none;}
+.quiz-topbar{position:sticky;top:56px;z-index:40;background:#fff;border:1px solid var(--sf-border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;box-shadow:0 2px 6px rgba(0,0,0,.06);}
+.timer-badge{font-weight:800;font-size:16px;color:var(--sf-black);background:var(--sf-grey);padding:6px 12px;border-radius:20px;border:1px solid var(--sf-border);}
+.timer-badge.low{animation:pulse 1s infinite;color:#fff;background:var(--fail-red);border-color:var(--fail-red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+.progress-badge{font-size:13px;color:#555;font-weight:600;}
+.question-block{background:#FFF;border:1px solid var(--sf-border);padding:14px;border-radius:6px;margin-bottom:12px;}
+.question-title{font-weight:700;margin-bottom:10px;font-size:clamp(13px,3.4vw,14px);color:var(--sf-black);}
+.option{display:block;margin-bottom:8px;font-size:clamp(13px,3.3vw,14px);cursor:pointer;padding:10px;border:1px solid var(--sf-border);border-radius:6px;min-height:44px;}
+.option:has(input:checked){border-color:var(--sf-red);background:var(--sf-light-red);}
+.option input{margin-right:8px;}
+.btn-submit{background:var(--sf-red);color:#FFF;border:none;padding:14px 25px;font-size:16px;font-weight:700;border-radius:6px;cursor:pointer;width:100%;margin-top:16px;min-height:52px;}
+.btn-submit:hover{background:#C11319;}
+.btn-submit:disabled{background:#ccc;cursor:not-allowed;}
+/* Result */
+#result-block{display:none;background:#FFF;border:1px solid var(--sf-border);border-top:4px solid var(--sf-red);padding:20px;border-radius:8px;margin-top:24px;text-align:center;}
+.score-badge{font-size:clamp(24px,7vw,32px);font-weight:800;margin:12px 0;color:var(--sf-black);}
+.status-pass{color:var(--pass-green);font-weight:700;font-size:19px;}
+.status-fail{color:var(--fail-red);font-weight:700;font-size:19px;}
+.trophy{font-size:44px;margin-bottom:8px;}
+.rating-box{background:var(--sf-grey);border-radius:8px;padding:16px;margin:18px 0;text-align:left;}
+.rating-scale{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;}
+.rating-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--sf-border);background:#fff;font-weight:700;cursor:pointer;font-size:14px;}
+.rating-btn.selected{background:var(--sf-red);color:#fff;border-color:var(--sf-red);}
+.review-list{text-align:left;max-height:340px;overflow-y:auto;border:1px solid var(--sf-border);border-radius:6px;padding:10px;margin:14px 0;background:#FAFAFA;font-size:12.5px;}
+.review-item{padding:8px 6px;border-bottom:1px dashed var(--sf-border);}
+.review-item:last-child{border-bottom:none;}
+.review-item.correct{color:var(--pass-green);}
+.review-item.wrong{color:var(--fail-red);}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
+.btn-secondary{background:var(--sf-black);color:#fff;border:none;padding:12px 18px;border-radius:6px;font-size:13.5px;font-weight:700;cursor:pointer;min-height:44px;}
+.alert-modal{display:none;background:#FFEBEE;color:#C62828;border:1px solid #EF9A9A;padding:12px 16px;border-radius:6px;margin-bottom:15px;font-weight:600;font-size:14px;}
+/* Instructions modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;padding:16px;overflow-y:auto;}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;}
+.modal-box{background:#fff;border-radius:10px;max-width:560px;width:100%;padding:20px;margin-top:24px;max-height:88vh;overflow-y:auto;}
+.modal-box h3{color:var(--sf-red);margin-top:0;font-size:17px;}
+.modal-box ol{padding-left:20px;}
+.modal-box li{margin-bottom:10px;font-size:14px;}
+.modal-close{background:var(--sf-red);color:#fff;border:none;padding:12px 20px;border-radius:6px;font-weight:700;cursor:pointer;width:100%;margin-top:14px;min-height:46px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-bar">
+    <div class="top-bar-row">
+      <div class="menu-wrap">
+        <button class="btn-menu" id="btnMenu" aria-label="Menu"><span></span><span></span><span></span></button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <div class="dm-title" id="t-menu-title">Chương trình đào tạo</div>
+          <div class="dropdown-item active"><span class="di-icon">🤝</span><span id="t-menu-item1">Kỹ năng mềm</span></div>
+          <div class="dropdown-item disabled"><span class="di-icon">📦</span><span id="t-menu-item2">Nghiệp vụ giao nhận hàng</span><span class="di-badge" id="t-menu-soon1">Sắp có</span></div>
+          <div class="dropdown-item disabled"><span class="di-icon">🚦</span><span id="t-menu-item3">An toàn giao thông</span><span class="di-badge" id="t-menu-soon2">Sắp có</span></div>
+          <div class="dropdown-item disabled"><span class="di-icon">📋</span><span id="t-menu-item4">Quy trình vận hành nội bộ</span><span class="di-badge" id="t-menu-soon3">Sắp có</span></div>
+        </div>
+      </div>
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn active" data-lang="vi">Tiếng Việt</button>
+        <button class="lang-btn" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+      </div>
+      <button class="btn-instructions" id="btnInstructions">ℹ️ <span id="t-instr-btn">Hướng dẫn làm bài</span></button>
+    </div>
+  </div>
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+  <div class="header">
+    <div class="brand-logo" aria-hidden="true">
+      <span class="brand-logo-mark">SF</span>
+      <span class="brand-logo-word">EXPRESS</span>
+    </div>
+    <h1 class="brand-title" id="t-main-title"></h1>
+    <div class="brand-subtitle" id="t-sub-title"></div>
+  </div>
+  <!-- ===== THỐNG KÊ CÔNG KHAI (số lượng, không hiện tên/email) ===== -->
+  <div class="stats-panel" id="statsPanel">
+    <button type="button" class="stats-tab" id="statsToggle" aria-expanded="false" aria-controls="statsBody">
+      <span id="t-stats-title"></span>
+      <span class="stats-tab-arrow" id="statsToggleArrow">▾</span>
+    </button>
+    <div class="stats-body" id="statsBody" style="display:none;">
+      <div class="stats-body-inner">
+        <div class="stats-filter-col">
+          <label id="t-stats-from-label" for="statsFrom"></label>
+          <input type="date" id="statsFrom">
+          <label id="t-stats-to-label" for="statsTo"></label>
+          <input type="date" id="statsTo">
+          <div class="stats-filter-btns">
+            <button type="button" id="btnStatsFilter"></button>
+            <button type="button" id="btnStatsReset"></button>
+          </div>
+        </div>
+        <div class="stats-dashboard-col">
+          <div class="stats-loading" id="statsLoading" style="display:none;"></div>
+          <div class="stats-dashboard" id="statsDashboard"></div>
+        </div>
+      </div>
+      <div class="stats-modules" id="statsModules"></div>
+      <div class="stats-rating" id="statsRating"></div>
+    </div>
+    <div class="stats-tooltip" id="statsTooltip"></div>
+  </div>
+  <!-- Modal Hướng dẫn -->
+  <div class="modal-overlay" id="instructionsModal">
+    <div class="modal-box">
+      <h3 id="t-instr-title"></h3>
+      <ol id="instr-steps"></ol>
+      <button class="modal-close" id="btnCloseInstr">OK</button>
+    </div>
+  </div>
+  <!-- Thông tin học viên -->
+  <div class="info-card">
+    <h3 id="t-info-group"></h3>
+    <div id="validation-alert" class="alert-modal"></div>
+    <div class="form-group">
+      <label id="t-lbl-name" for="driverName"></label>
+      <input type="text" id="driverName">
+    </div>
+    <div class="form-group">
+      <label id="t-lbl-id" for="driverID"></label>
+      <input type="text" id="driverID">
+    </div>
+  </div>
+  <div id="modules-container"></div>
+  <!-- KHU VỰC BẮT ĐẦU LÀM BÀI KIỂM TRA -->
+  <div class="quiz-start-banner" id="start-banner">
+    <h2 style="margin:0 0 10px 0;background:none;color:var(--sf-red);padding:0;text-transform:none;" id="t-quiz-banner-title"></h2>
+    <p style="margin-bottom:18px;font-size:14px;" id="t-quiz-sub"></p>
+    <button class="btn-start" id="t-btn-start"></button>
+  </div>
+  <!-- BÀI KIỂM TRA -->
+  <div id="quiz-section">
+    <div class="quiz-topbar">
+      <div class="timer-badge" id="timerBadge">20:00</div>
+      <div class="progress-badge" id="progressBadge"></div>
+    </div>
+    <form id="quizForm">
+      <div id="questions-container"></div>
+      <button type="button" class="btn-submit" id="t-btn-submit"></button>
+    </form>
+  </div>
+  <!-- KẾT QUẢ -->
+  <div id="result-block">
+    <div class="trophy" id="resTrophy">🏆</div>
+    <h3 style="margin:0;font-size:20px;" id="resHeader"></h3>
+    <p style="margin:10px 0;font-size:15px;" id="resStudentLine"></p>
+    <div class="score-badge" id="resScore">0/20 (0%)</div>
+    <div id="resStatus" class="status-pass"></div>
+    <div class="review-list" id="reviewList"></div>
+    <div class="rating-box">
+      <div id="t-rating-label" style="font-weight:700;font-size:14px;"></div>
+      <div id="t-rating-hint" style="font-size:12.5px;color:#666;margin-top:4px;"></div>
+      <div class="rating-scale" id="ratingScale"></div>
+    </div>
+    <div id="ratingRequiredMsg" class="alert-modal" style="margin-top:6px;"></div>
+    <div id="submitRow" style="margin-top:10px;">
+      <button type="button" class="btn-submit" id="btnSubmitResult" style="margin-top:0;"></button>
+    </div>
+    <div id="submitStatus" style="font-size:13.5px;font-weight:700;margin-top:12px;min-height:1em;"></div>
+    <div class="btn-row" id="exitRow" style="display:none;margin-top:6px;">
+      <button class="btn-secondary" id="btnExit"></button>
+    </div>
+    <div id="exitMsg" style="display:none;font-size:12.5px;color:#666;margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- ===== FIREBASE (nộp bài) ===== -->
+<!-- Firebase SDK (bản compat, dùng được trực tiếp qua thẻ script HTML thường) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   CẤU HÌNH FIREBASE — BẮT BUỘC ĐIỀN TRƯỚC KHI DÙNG THẬT
+   1. Vào https://console.firebase.google.com → Tạo dự án mới (Add project).
+   2. Trong dự án, vào Build → Firestore Database → Create database
+      (chọn chế độ Production, khu vực gần Việt Nam, ví dụ asia-southeast1).
+   3. Vào Project settings (biểu tượng bánh răng) → General → mục "Your apps"
+      → bấm biểu tượng Web "</>" để tạo Web app → copy đoạn firebaseConfig.
+   4. Dán đè object bên dưới bằng config vừa copy.
+   5. Vào Firestore Database → tab Rules, dán đúng nội dung sau rồi bấm Publish:
+
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            // Bản ghi ĐẦY ĐỦ: tên, ID nhân viên, chi tiết từng câu trả lời.
+            match /quiz_submissions/{docId} {
+              allow create: if true;   // ai cũng nộp được bài (không cần đăng nhập)
+              allow read, update, delete: if false; // KHÔNG ai đọc/sửa/xoá được từ trình duyệt
+            }
+            // Bản ghi CÔNG KHAI cho bảng thống kê đầu trang: điểm số + thời gian +
+            // kết quả đúng/sai theo từng kỹ năng (module) + đánh giá 1-10, đều là số liệu
+            // tổng hợp. KHÔNG chứa tên/ID/nội dung câu hỏi — an toàn để mọi người đọc.
+            match /quiz_stats_public/{docId} {
+              allow create: if true;
+              allow read: if true;
+              allow update, delete: if false;
+            }
+          }
+        }
+
+      Quy tắc này CHẶN việc đọc lại dữ liệu có tên thật (collection quiz_submissions),
+      chỉ cho phép TẠO MỚI bản ghi ở đó. Muốn xem danh sách tên/ID người đã làm bài,
+      vào thẳng Firebase Console (Firestore Database → collection "quiz_submissions").
+      Collection "quiz_stats_public" thì cho phép đọc công khai vì không chứa thông tin cá nhân —
+      đây là dữ liệu nuôi bảng thống kê số lượng ở đầu trang web.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCS3fCvOukNUmlw4KqPOewTdtmL7ReDKvU",
+  authDomain: "sf-express-3fe07.firebaseapp.com",
+  databaseURL: "https://sf-express-3fe07-default-rtdb.firebaseio.com",
+  projectId: "sf-express-3fe07",
+  storageBucket: "sf-express-3fe07.firebasestorage.app",
+  messagingSenderId: "90922574232",
+  appId: "1:90922574232:web:bffb5a8a336e3064efcbed",
+  measurementId: "G-3HMY76VP55"
+};
+
+const FIREBASE_CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
+let db = null;
+if(FIREBASE_CONFIGURED){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }catch(e){
+    console.error('Lỗi khởi tạo Firebase:', e);
+    db = null;
+  }
+} else {
+  console.warn('Chưa cấu hình Firebase — sửa firebaseConfig trong file index.html trước khi dùng thật.');
+}
+</script>
+
+<script>
+const UI = {
+vi:{
+  mainTitle:"SỔ TAY ĐÀO TẠO KỸ NĂNG MỀM CHUYÊN NGHIỆP DÀNH CHO TÀI XẾ & NHÂN VIÊN GIAO NHẬN",
+  subTitle:"Thương hiệu: SF Express | SF Quốc Tế – Dịch Vụ Vận Chuyển Logistics Toàn Cầu",
+  statsTitle:"📊 Thống kê kết quả",
+  statsFromLabel:"Từ ngày:",
+  statsToLabel:"Đến ngày:",
+  statsFilterBtn:"Xem",
+  statsResetBtn:"Xem tất cả",
+  statsTotal:"Đã làm bài",
+  statsPassed:"Đạt yêu cầu",
+  statsFailed:"Chưa đạt",
+  statsAvg:"Điểm TB",
+  statsLoading:"Đang tải thống kê...",
+  statsNotConfigured:"Chưa cấu hình Firebase nên chưa có thống kê.",
+  statsError:"Không tải được thống kê, vui lòng thử lại.",
+  statsEmpty:"Chưa có ai làm bài trong khoảng thời gian này.",
+  statsPeopleUnit:" người",
+  statsModulesTitle:"Kết quả theo từng kỹ năng",
+  statsRatingTitle:"Đánh giá mức độ hài lòng của học viên",
+  menuTitle:"Chương trình đào tạo",
+  menuItem1:"Kỹ năng mềm",
+  menuItem2:"Nghiệp vụ giao nhận hàng",
+  menuItem3:"An toàn giao thông",
+  menuItem4:"Quy trình vận hành nội bộ",
+  menuSoon:"Sắp có",
+  instrBtn:"Hướng dẫn làm bài",
+  instrTitle:"HƯỚNG DẪN LÀM BÀI KIỂM TRA",
+  instrSteps:[
+    "Đọc kỹ toàn bộ 6 module bài học (có thể bấm vào tiêu đề từng module để mở/thu gọn) trước khi bắt đầu làm bài.",
+    "Điền đầy đủ và chính xác Họ tên và Mã nhân viên (ID) ở phần thông tin học viên.",
+    "Bài kiểm tra gồm 20 câu hỏi trắc nghiệm được rút ngẫu nhiên từ ngân hàng 60 câu, mỗi lần làm bài đề sẽ khác nhau.",
+    "Thời gian làm bài giới hạn 20 phút. Đồng hồ đếm ngược sẽ tự động nộp bài khi hết giờ.",
+    "Điểm đạt yêu cầu: từ 16/20 câu đúng (80%) trở lên.",
+    "Sau khi trả lời hết 20 câu và bấm 'Nộp Bài', hệ thống hiển thị kết quả chi tiết. Vui lòng chọn mức đánh giá mức độ hữu ích của nội dung (thang điểm 1–10) trước khi nộp.",
+    "Bấm nút 'Nộp Bài' lần cuối để gửi kết quả — dữ liệu sẽ tự động được lưu vào hệ thống, không cần gửi email thủ công.",
+    "Không tắt trình duyệt hoặc tải lại trang giữa lúc đang làm bài vì kết quả sẽ không được lưu lại."
+  ],
+  infoGroup:"XÁC NHẬN THÔNG TIN HỌC VIÊN THAM GIA ĐÀO TẠO",
+  lblName:"Họ và tên nhân viên / Tài xế: *",
+  lblID:"Mã số nhân viên (ID): *",
+  phName:"Nhập đầy đủ họ tên...",
+  phID:"Nhập mã nhân viên...",
+  alertMissing:"⚠️ Vui lòng điền đầy đủ Họ tên và Mã nhân viên trước khi làm bài!",
+  moduleHint:"(Bấm vào tiêu đề để mở / thu gọn nội dung)",
+  theoryLabel:"📘 Khung Lý Thuyết & Trích Dẫn",
+  caseLabel:"🌍 Bài Học Từ Doanh Nghiệp Chuyển Phát Trong & Ngoài Nước",
+  checklistLabel:"CHECKLIST",
+  dosLabel:"NÊN LÀM (DOs)",
+  dontsLabel:"KHÔNG NÊN LÀM (DON'Ts)",
+  scenarioLabel1:"Tình Huống",
+  scenarioLabel2:"Quy Trình Ứng Xử",
+  scenarioLabel3:"Mẫu Câu Nói / Hành Động Chuẩn",
+  flashcardHead:"🔁 Ôn Tập Nhanh (Bấm vào thẻ để xem đáp án)",
+  quizBannerTitle:"BÀI KIỂM TRA TỔNG HỢP KỸ NĂNG MỀM LOGISTICS",
+  quizSub:"Đề thi gồm <strong>20 câu hỏi ngẫu nhiên</strong> trích từ ngân hàng 60 câu • Thời gian làm bài <strong>20 phút</strong> • Đạt tối thiểu <strong>80% (16/20)</strong> để hoàn thành.",
+  btnStart:"🚀 BẮT ĐẦU LÀM BÀI KIỂM TRA",
+  btnSubmit:"NỘP BÀI KIỂM TRA",
+  questionWord:"Câu",
+  progressPrefix:"Đã trả lời",
+  resHeader:"KẾT QUẢ ĐÀO TẠO",
+  resPass:"PASSED – ĐẠT YÊU CẦU",
+  resFail:"FAILED – CHƯA ĐẠT (CẦN LÀM LẠI)",
+  ratingLabel:"Đánh giá mức độ hữu ích của nội dung chương trình (thang điểm 1–10):",
+  ratingHint:"Vui lòng chọn 1 mức điểm trước khi nộp bài.",
+  btnSubmitResult:"📤 NỘP BÀI",
+  ratingRequiredMsg:"⚠️ Vui lòng chọn mức đánh giá trước khi nộp bài!",
+  submittingMsg:"⏳ Đang nộp bài, vui lòng đợi...",
+  submitSuccessMsg:"✅ Nộp bài thành công! Bài thi của bạn đã được ghi nhận, không cần thao tác gì thêm.",
+  submitErrorMsg:"❌ Nộp bài thất bại (lỗi kết nối mạng). Vui lòng bấm NỘP BÀI để thử lại.",
+  notConfiguredMsg:"⚠️ Hệ thống nộp bài chưa được cấu hình. Vui lòng liên hệ bộ phận IT.",
+  btnExit:"🚪 Thoát",
+  exitHint:"Bạn có thể đóng tab/cửa sổ trình duyệt này để thoát khỏi trang.",
+  reviewTitle:"Chi tiết bài làm:",
+  yourAnswer:"Bạn chọn",
+  correctAnswer:"Đáp án đúng",
+  notAnswered:"(chưa chọn)",
+  studentLine:"Học viên"
+},
+en:{
+  mainTitle:"PROFESSIONAL SOFT SKILLS TRAINING HANDBOOK FOR DRIVERS & COURIERS",
+  subTitle:"Brand: SF Express | SF International – Global Logistics Transport Service",
+  statsTitle:"📊 Results Statistics",
+  statsFromLabel:"From:",
+  statsToLabel:"To:",
+  statsFilterBtn:"View",
+  statsResetBtn:"View All",
+  statsTotal:"Completed",
+  statsPassed:"Passed",
+  statsFailed:"Not Passed",
+  statsAvg:"Avg. Score",
+  statsLoading:"Loading statistics...",
+  statsNotConfigured:"Firebase is not configured yet, so no statistics are available.",
+  statsError:"Could not load statistics, please try again.",
+  statsEmpty:"No one has taken the test in this period yet.",
+  statsPeopleUnit:"",
+  statsModulesTitle:"Results by Skill",
+  statsRatingTitle:"Trainee Satisfaction Rating",
+  menuTitle:"Training Programs",
+  menuItem1:"Soft Skills",
+  menuItem2:"Pickup & Delivery Operations",
+  menuItem3:"Traffic Safety",
+  menuItem4:"Internal Operating Procedures",
+  menuSoon:"Coming Soon",
+  instrBtn:"Exam Instructions",
+  instrTitle:"HOW TO TAKE THE TEST",
+  instrSteps:[
+    "Read all 6 lesson modules carefully (tap a module title to expand/collapse it) before starting the test.",
+    "Fill in your full name and Employee ID accurately in the trainee information section.",
+    "The test contains 20 multiple-choice questions randomly drawn from a bank of 60; each attempt is different.",
+    "Time limit: 20 minutes. The countdown timer will auto-submit your test when time runs out.",
+    "Passing score: 16/20 (80%) or higher.",
+    "After answering all 20 questions and tapping 'Submit', your detailed results will appear. Please rate how useful the content was (scale 1–10) before submitting.",
+    "Tap the final 'Submit' button to send your results — the data is saved automatically, no email needed.",
+    "Do not close the browser or reload the page while taking the test, or your progress will be lost."
+  ],
+  infoGroup:"TRAINEE INFORMATION CONFIRMATION",
+  lblName:"Full Name / Driver Name: *",
+  lblID:"Employee ID: *",
+  phName:"Enter your full name...",
+  phID:"Enter your employee ID...",
+  alertMissing:"⚠️ Please fill in your Full Name and Employee ID before starting the test!",
+  moduleHint:"(Tap the title to expand / collapse)",
+  theoryLabel:"📘 Theoretical Framework & Citations",
+  caseLabel:"🌍 Lessons From Domestic & International Courier Companies",
+  checklistLabel:"CHECKLIST",
+  dosLabel:"DOs",
+  dontsLabel:"DON'Ts",
+  scenarioLabel1:"Scenario",
+  scenarioLabel2:"Response Procedure",
+  scenarioLabel3:"Sample Script / Standard Action",
+  flashcardHead:"🔁 Quick Review (Tap a card to see the answer)",
+  quizBannerTitle:"LOGISTICS SOFT SKILLS COMPREHENSIVE TEST",
+  quizSub:"The test contains <strong>20 random questions</strong> from a bank of 60 • Time limit <strong>20 minutes</strong> • Minimum passing score <strong>80% (16/20)</strong>.",
+  btnStart:"🚀 START THE TEST",
+  btnSubmit:"SUBMIT TEST",
+  questionWord:"Question",
+  progressPrefix:"Answered",
+  resHeader:"TRAINING RESULT",
+  resPass:"PASSED",
+  resFail:"FAILED – NEEDS RETAKE",
+  ratingLabel:"Rate how useful this program's content was (scale 1–10):",
+  ratingHint:"Please select a rating before submitting.",
+  btnSubmitResult:"📤 SUBMIT",
+  ratingRequiredMsg:"⚠️ Please select a rating before submitting!",
+  submittingMsg:"⏳ Submitting, please wait...",
+  submitSuccessMsg:"✅ Submitted successfully! Your test has been recorded — no further action needed.",
+  submitErrorMsg:"❌ Submission failed (network error). Please tap SUBMIT to try again.",
+  notConfiguredMsg:"⚠️ The submission system is not configured yet. Please contact IT.",
+  btnExit:"🚪 Exit",
+  exitHint:"You can now close this browser tab/window to exit the page.",
+  reviewTitle:"Answer Review:",
+  yourAnswer:"Your answer",
+  correctAnswer:"Correct answer",
+  notAnswered:"(not answered)",
+  studentLine:"Trainee"
+},
+zh:{
+  mainTitle:"顺丰速运司机与收派员专业软技能培训手册",
+  subTitle:"品牌：顺丰速运 | 顺丰国际 – 全球物流运输服务",
+  statsTitle:"📊 结果统计",
+  statsFromLabel:"从：",
+  statsToLabel:"至：",
+  statsFilterBtn:"查看",
+  statsResetBtn:"查看全部",
+  statsTotal:"已完成",
+  statsPassed:"已通过",
+  statsFailed:"未通过",
+  statsAvg:"平均分",
+  statsLoading:"正在加载统计数据...",
+  statsNotConfigured:"尚未配置Firebase，暂无统计数据。",
+  statsError:"加载统计数据失败，请重试。",
+  statsEmpty:"该时间段内暂无人提交测试。",
+  statsPeopleUnit:"人",
+  statsModulesTitle:"按技能分类的结果",
+  statsRatingTitle:"学员满意度评分",
+  menuTitle:"培训课程",
+  menuItem1:"软技能",
+  menuItem2:"收派件业务",
+  menuItem3:"交通安全",
+  menuItem4:"内部运营流程",
+  menuSoon:"即将上线",
+  instrBtn:"考试说明",
+  instrTitle:"考试指南",
+  instrSteps:[
+    "开始考试前请仔细阅读全部6个学习模块（点击模块标题可展开/收起）。",
+    "请在学员信息处准确填写姓名和员工工号（ID）。",
+    "考试共20道选择题，从60道题库中随机抽取，每次考试题目不同。",
+    "考试时间限制为20分钟，倒计时结束后系统将自动提交试卷。",
+    "及格标准：20题中答对16题（80%）及以上。",
+    "答完全部20题并点击「提交」后将显示详细成绩，请在最终提交前为课程内容的有用程度评分（1-10分）。",
+    "点击最后的「提交」按钮发送成绩——数据将自动保存，无需发送邮件。",
+    "考试过程中请勿关闭浏览器或刷新页面，否则答题记录将丢失。"
+  ],
+  infoGroup:"学员信息确认",
+  lblName:"员工姓名 / 司机姓名: *",
+  lblID:"员工工号（ID）: *",
+  phName:"请输入姓名...",
+  phID:"请输入员工工号...",
+  alertMissing:"⚠️ 请在开始考试前填写姓名和员工工号！",
+  moduleHint:"（点击标题可展开/收起）",
+  theoryLabel:"📘 理论框架与引用来源",
+  caseLabel:"🌍 国内外快递企业的经验借鉴",
+  checklistLabel:"检查清单",
+  dosLabel:"应该做 (DOs)",
+  dontsLabel:"不应该做 (DON'Ts)",
+  scenarioLabel1:"情境",
+  scenarioLabel2:"应对流程",
+  scenarioLabel3:"标准话术 / 行动示例",
+  flashcardHead:"🔁 快速复习（点击卡片查看答案）",
+  quizBannerTitle:"物流软技能综合测试",
+  quizSub:"试卷共 <strong>20道随机题目</strong>，来自60题题库 • 考试时间 <strong>20分钟</strong> • 及格线 <strong>80%（16/20）</strong>。",
+  btnStart:"🚀 开始测试",
+  btnSubmit:"提交测试",
+  questionWord:"第",
+  progressPrefix:"已作答",
+  resHeader:"培训结果",
+  resPass:"通过 (PASSED)",
+  resFail:"未通过 (FAILED) – 需要重新测试",
+  ratingLabel:"请为本课程内容的有用程度评分（1-10分）：",
+  ratingHint:"请先选择评分再提交。",
+  btnSubmitResult:"📤 提交",
+  ratingRequiredMsg:"⚠️ 请先选择评分再提交！",
+  submittingMsg:"⏳ 正在提交，请稍候...",
+  submitSuccessMsg:"✅ 提交成功！您的测试已被记录，无需其他操作。",
+  submitErrorMsg:"❌ 提交失败（网络错误）。请点击「提交」重试。",
+  notConfiguredMsg:"⚠️ 提交系统尚未配置，请联系IT部门。",
+  btnExit:"🚪 退出",
+  exitHint:"您现在可以关闭此浏览器标签页/窗口以退出页面。",
+  reviewTitle:"答题详情：",
+  yourAnswer:"您的选择",
+  correctAnswer:"正确答案",
+  notAnswered:"（未作答）",
+  studentLine:"学员"
+}
+};
+</script>
+<script>
+const MODULES = [
+{
+id:'m1',
+title:{vi:"01 – Kỹ Năng Lắng Nghe", en:"01 – Listening Skills", zh:"01 – 倾听技巧"},
+blocks:[
+{type:'list', heading:{vi:"1. Mục Tiêu & Nguyên Tắc Lắng Nghe Trong Logistics", en:"1. Goals & Principles of Listening in Logistics", zh:"1. 物流场景中倾听的目标与原则"},
+ items:[
+  {vi:"<strong>Lắng nghe chủ động (Active Listening):</strong> Tập trung chú ý 100% khi khách hàng gửi/nhận hàng hoặc bộ phận điều hành truyền đạt thông tin (yêu cầu vận chuyển, địa điểm giao nhận, hàng dễ vỡ, thời gian hẹn).",
+   en:"<strong>Active Listening:</strong> Give 100% attention when a customer is sending/receiving a parcel or when Operations relays information (shipping requests, pickup/drop-off location, fragile items, appointment time).",
+   zh:"<strong>主动倾听：</strong>在客户寄/收件或调度部门传达信息（运输要求、收发地点、易碎物品、预约时间）时，做到100%专注。"},
+  {vi:"<strong>Không ngắt lời:</strong> Để khách hàng hoặc cấp trên nói hết câu trước khi phản hồi hay đặt câu hỏi làm rõ về đơn hàng.",
+   en:"<strong>Don't interrupt:</strong> Let the customer or supervisor finish speaking before responding or asking clarifying questions about the order.",
+   zh:"<strong>不要打断：</strong>让客户或上级说完整句话后，再回应或就订单提出澄清问题。"},
+  {vi:"<strong>Xác nhận lại thông tin (Paraphrasing):</strong> Nhắc lại ngắn gọn các chi tiết quan trọng để tránh giao sai hàng hoặc nhầm địa chỉ <i>(Ví dụ: \"Dạ, em xác nhận lại kiện hàng này giao tại kho B, yêu cầu kiểm hàng trước đúng không ạ?\")</i>.",
+   en:"<strong>Paraphrasing:</strong> Briefly repeat key details back to avoid delivering the wrong parcel or address <i>(e.g., \"Just confirming, this parcel goes to Warehouse B and needs inspection before delivery, correct?\")</i>.",
+   zh:"<strong>复述确认：</strong>简要重复关键信息，避免送错货物或地址（例如：\"请确认一下，这件包裹是送到B仓库，并且需要先验货，对吗？\"）。"}
+ ]},
+{type:'list', heading:{vi:"2. Kỹ Thuật Lắng Nghe Theo Bối Cảnh", en:"2. Context-Based Listening Techniques", zh:"2. 按情境划分的倾听技巧"},
+ items:[
+  {vi:"<strong>Khi khách hàng đang vội/căng thẳng:</strong> Lắng nghe với thái độ bình tĩnh, ghi nhận ngắn gọn mã vận đơn, tập trung xử lý nhanh thủ tục giao nhận hàng.",
+   en:"<strong>When the customer is rushed/stressed:</strong> Listen calmly, note the tracking code briefly, and focus on completing the handover quickly.",
+   zh:"<strong>当客户匆忙或情绪紧张时：</strong>保持冷静倾听，简要记录运单号，专注快速完成收发手续。"},
+  {vi:"<strong>Khi tiếp nhận chỉ đạo điều hành:</strong> Ghi chép hoặc xác nhận ngay qua ứng dụng/tin nhắn về lộ trình lấy/giao hàng và các lưu ý đặc biệt đối với bưu kiện.",
+   en:"<strong>When receiving instructions from Operations:</strong> Note or confirm immediately via app/message the pickup-delivery route and any special notes about the parcel.",
+   zh:"<strong>接收调度指令时：</strong>立即通过App或消息记录/确认取送货路线及包裹的特殊注意事项。"}
+ ]},
+{type:'theory', body:{
+  vi:"<strong>Mô hình HURIER</strong> (Judi Brownell, Đại học Cornell, 1985) chia kỹ năng lắng nghe hiệu quả thành 6 thành phần: Hearing (nghe), Understanding (hiểu), Remembering (ghi nhớ), Interpreting (diễn giải), Evaluating (đánh giá) và Responding (phản hồi). Trong ngành logistics, một nghiên cứu kinh điển về hành vi lắng nghe (Ralph Nichols, Đại học Minnesota) chỉ ra rằng người nghe thông thường chỉ giữ lại khoảng 25–50% nội dung ngay sau khi nghe – đây là lý do kỹ thuật <em>paraphrasing</em> (nhắc lại xác nhận) được xem là bắt buộc khi tiếp nhận thông tin đơn hàng, địa chỉ và yêu cầu đặc biệt. Nguyên tắc <strong>7-38-55</strong> của Albert Mehrabian (1971) cũng nhắc tài xế rằng thái độ, giọng điệu và ngôn ngữ cơ thể ảnh hưởng đến cảm nhận của khách hàng nhiều hơn nội dung lời nói khi xử lý tình huống nhạy cảm.",
+  en:"The <strong>HURIER Model</strong> (Judi Brownell, Cornell University, 1985) breaks effective listening into six components: Hearing, Understanding, Remembering, Interpreting, Evaluating, and Responding. Classic listening research (Ralph Nichols, University of Minnesota) found that listeners typically retain only about 25–50% of what they hear immediately afterward — this is why <em>paraphrasing</em> is treated as mandatory when receiving order details, addresses, and special instructions. Albert Mehrabian's <strong>7-38-55 rule</strong> (1971) also reminds drivers that attitude, tone, and body language shape a customer's perception more than the words themselves in sensitive situations.",
+  zh:"<strong>HURIER模型</strong>（Judi Brownell，康奈尔大学，1985年）将有效倾听分为六个要素：听（Hearing）、理解（Understanding）、记忆（Remembering）、诠释（Interpreting）、评估（Evaluating）和回应（Responding）。经典倾听研究（Ralph Nichols，明尼苏达大学）发现，人们通常在听完后仅能记住约25%-50%的内容——这正是接收订单信息、地址和特殊要求时必须使用「复述确认」技巧的原因。Albert Mehrabian（1971年）提出的<strong>7-38-55法则</strong>也提醒司机：在敏感情境中，态度、语气和肢体语言对客户感受的影响远大于话语内容本身。"
+ }, source:{vi:"Nguồn: Brownell, J. (1985) HURIER Model; Nichols, R.G., Univ. of Minnesota listening studies; Mehrabian, A. (1971) Silent Messages.",
+   en:"Sources: Brownell, J. (1985) HURIER Model; Nichols, R.G., University of Minnesota listening studies; Mehrabian, A. (1971) Silent Messages.",
+   zh:"来源：Brownell, J.（1985）HURIER模型；Nichols, R.G. 明尼苏达大学倾听研究；Mehrabian, A.（1971）《无声的信息》。"}},
+{type:'case', body:{
+  vi:"<strong>FedEx</strong> đưa lắng nghe khách hàng vào cam kết dịch vụ \"Purple Promise\" (\"Tôi hứa sẽ làm cho mỗi trải nghiệm của khách hàng trở nên nổi bật\"), trong đó nhân viên giao nhận được huấn luyện lắng nghe để phát hiện sớm bất mãn trước khi phát sinh khiếu nại chính thức. <strong>DHL</strong> triển khai chương trình \"First Choice\" dựa trên nguyên lý Lean Six Sigma, khuyến khích nhân viên tuyến đầu ghi nhận phản hồi của khách hàng như một nguồn dữ liệu cải tiến quy trình. Tại Việt Nam, nhiều đơn vị chuyển phát nội địa (Giao Hàng Nhanh, Viettel Post, J&T Express) đều xây dựng kịch bản xác nhận đơn hàng qua điện thoại/tin nhắn trước khi giao – một hình thức lắng nghe chủ động giúp giảm tỷ lệ giao thất bại (delivery failure rate).",
+  en:"<strong>FedEx</strong> embeds customer listening into its \"Purple Promise\" (\"I will make every customer experience outstanding\"), training couriers to listen for early signs of dissatisfaction before a formal complaint arises. <strong>DHL's</strong> \"First Choice\" program, built on Lean Six Sigma principles, encourages frontline staff to treat customer feedback as data for process improvement. In Vietnam, domestic carriers such as Giao Hang Nhanh, Viettel Post, and J&T Express all use pre-delivery confirmation calls/messages — a form of active listening that reduces delivery failure rates.",
+  zh:"<strong>联邦快递（FedEx）</strong>将倾听客户融入其「紫色承诺」（\"我承诺让每一次客户体验都出色\"），培训收派员在正式投诉产生前就能听出客户不满的早期信号。<strong>DHL</strong>基于精益六西格玛理念推行「First Choice」计划，鼓励一线员工将客户反馈视为流程改进的数据来源。在越南，多家本土快递企业（Giao Hang Nhanh、Viettel Post、J&T Express）在派送前均采用电话/短信确认的方式——这是一种主动倾听，有助于降低派送失败率。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Kỹ thuật Paraphrasing trong lắng nghe khi giao nhận hàng nghĩa là gì?",en:"❓ 1. What does the Paraphrasing technique mean when handling parcels?",zh:"❓ 1. 收发货时的「复述确认」技巧是什么意思？"},
+  a:{vi:"💡 Nhắc lại ngắn gọn các chi tiết bưu kiện, địa chỉ và ghi chú giao hàng để xác nhận chính xác 100%.",en:"💡 Briefly repeating parcel details, address, and delivery notes to confirm 100% accuracy.",zh:"💡 简要复述包裹信息、地址和派送备注，以确保100%准确无误。"}},
+ {q:{vi:"❓ 2. Vì sao paraphrasing được xem là bắt buộc theo nghiên cứu của Nichols?",en:"❓ 2. Why is paraphrasing considered mandatory based on Nichols' research?",zh:"❓ 2. 根据Nichols的研究，为什么复述确认是必须的？"},
+  a:{vi:"💡 Vì người nghe thường chỉ nhớ 25–50% nội dung ngay sau khi nghe, nên cần xác nhận lại để tránh sai sót.",en:"💡 Because listeners usually retain only 25–50% of what they hear, so confirming details prevents mistakes.",zh:"💡 因为听者通常只能记住25%-50%的内容，所以需要复述确认以避免出错。"}},
+ {q:{vi:"❓ 3. Khi nhận lệnh điều hành lấy hàng phát sinh, tài xế cần làm gì ngay?",en:"❓ 3. When receiving an urgent pickup order from Operations, what should the driver do immediately?",zh:"❓ 3. 收到调度部门临时取件指令时，司机应立即做什么？"},
+  a:{vi:"💡 Xác nhận ngay lộ trình, thời gian Cut-off và các yêu cầu đóng gói hàng hóa.",en:"💡 Immediately confirm the route, cut-off time, and packaging requirements.",zh:"💡 立即确认路线、截单时间和包装要求。"}}
+]}
+]
+},
+{
+id:'m2',
+title:{vi:"02 – Kỹ Năng Giao Tiếp Với Khách Hàng Logistics", en:"02 – Customer Communication Skills in Logistics", zh:"02 – 物流客户沟通技巧"},
+blocks:[
+{type:'list', heading:{vi:"1. Tác Phong & Quy Chuẩn Giao Tiếp Giao Nhận", en:"1. Conduct & Standards for Pickup/Delivery Communication", zh:"1. 收派件的仪态与沟通规范"},
+ items:[
+  {vi:"<strong>Chào hỏi & Xưng hô:</strong> Sử dụng lời chào lịch sự, xưng hô tôn trọng (Anh/Chị). Luôn nở nụ cười nhẹ và có thái độ hợp tác.",
+   en:"<strong>Greetings:</strong> Use polite greetings and respectful address. Always keep a light smile and a cooperative attitude.",
+   zh:"<strong>问候与称呼：</strong>使用礼貌的问候语和尊重的称呼，始终保持微笑和合作的态度。"},
+  {vi:"<strong>Ngoại hình & Trang phục:</strong> Đồng phục SF Express gọn gàng, đeo thẻ nhân viên, xe và thùng hàng luôn sạch sẽ.",
+   en:"<strong>Appearance & Uniform:</strong> Tidy SF Express uniform, employee badge worn, vehicle and cargo box always clean.",
+   zh:"<strong>仪容与着装：</strong>整洁的顺丰制服，佩戴工牌，车辆和货厢始终保持整洁。"},
+  {vi:"<strong>Thao tác bưu gửi chuyên nghiệp:</strong> Nâng niu kiện hàng, bưng bê bằng hai tay, đặt hàng nhẹ nhàng, hỗ trợ bưng hàng vào nơi quy định cho khách.",
+   en:"<strong>Professional parcel handling:</strong> Handle parcels with care, carry with both hands, place gently, and help carry to the customer's designated spot.",
+   zh:"<strong>专业的包裹操作：</strong>轻拿轻放，双手搬运，帮助客户将货物放到指定位置。"}
+ ]},
+{type:'table', dosDonts:true, heading:{vi:"2. Quy Tắc NÊN & KHÔNG NÊN Trong Giao Tiếp", en:"2. DOs & DON'Ts of Communication", zh:"2. 沟通中的应该与不应该"},
+ rows:[
+  {dos:{vi:"Chủ động hỗ trợ bưng bê, xếp dỡ kiện hàng giúp khách hàng.",en:"Proactively help carry and unload parcels for the customer.",zh:"主动协助客户搬运、卸载货物。"},
+   donts:{vi:"Bàn luận các chủ đề nhạy cảm (chính trị, tôn giáo, đời tư).",en:"Discuss sensitive topics (politics, religion, personal life).",zh:"讨论敏感话题（政治、宗教、隐私）。"}},
+  {dos:{vi:"Nói năng rõ ràng, thái độ chuẩn mực, tôn trọng quy định của khách.",en:"Speak clearly, act professionally, and respect the customer's rules.",zh:"表达清晰，态度得体，尊重客户的规定。"},
+   donts:{vi:"Quăng quật, ném bưu kiện hoặc kéo lê thùng hàng trên mặt đất.",en:"Throw, toss parcels, or drag boxes on the ground.",zh:"扔摔包裹或在地上拖拽货箱。"}},
+  {dos:{vi:"Chủ động hỏi vị trí khách muốn đặt hàng hóa.",en:"Proactively ask where the customer wants the parcel placed.",zh:"主动询问客户希望货物摆放的位置。"},
+   donts:{vi:"Tỏ thái độ khó chịu khi hàng nặng, cồng kềnh hoặc khách yêu cầu kiểm tra hàng.",en:"Show annoyance when parcels are heavy/bulky or when customers ask to inspect items.",zh:"因货物笨重或客户要求验货而表现出不耐烦。"}}
+ ]},
+{type:'theory', body:{
+  vi:"<strong>Mô hình SERVQUAL</strong> (Parasuraman, Zeithaml & Berry, 1988) xác định 5 yếu tố khách hàng dùng để đánh giá chất lượng dịch vụ: Độ tin cậy (Reliability), Khả năng đáp ứng (Responsiveness), Sự đảm bảo (Assurance), Sự đồng cảm (Empathy) và Yếu tố hữu hình (Tangibles – gồm cả tác phong, trang phục, tình trạng xe/hàng hóa). Với ngành chuyển phát, \"yếu tố hữu hình\" chiếm tỷ trọng lớn vì khách hàng đánh giá cả doanh nghiệp qua hình ảnh người giao hàng trực tiếp tiếp xúc – đây gọi là hiệu ứng \"điểm chạm cuối cùng\" (last-mile touchpoint), thời điểm duy nhất khách hàng gặp trực tiếp đại diện thương hiệu trong toàn bộ chuỗi cung ứng.",
+  en:"The <strong>SERVQUAL model</strong> (Parasuraman, Zeithaml & Berry, 1988) identifies five dimensions customers use to judge service quality: Reliability, Responsiveness, Assurance, Empathy, and Tangibles (including staff conduct, uniform, and vehicle/parcel condition). In courier services, \"Tangibles\" carries extra weight because the courier is often the brand's only human touchpoint the customer ever meets — known as the \"last-mile touchpoint\" effect.",
+  zh:"<strong>SERVQUAL模型</strong>（Parasuraman, Zeithaml & Berry，1988年）提出客户评价服务质量的五个维度：可靠性（Reliability）、响应性（Responsiveness）、保证性（Assurance）、同理心（Empathy）和有形性（Tangibles，包括仪表、着装、车辆与货物状况）。在快递行业中，「有形性」权重尤为突出，因为收派员往往是客户在整个供应链中唯一直接接触到的品牌代表——这被称为「最后一公里触点」效应。"
+ }, source:{vi:"Nguồn: Parasuraman, A., Zeithaml, V.A., Berry, L.L. (1988) SERVQUAL: A Multiple-Item Scale, Journal of Retailing.",
+   en:"Source: Parasuraman, A., Zeithaml, V.A., Berry, L.L. (1988) SERVQUAL: A Multiple-Item Scale, Journal of Retailing.",
+   zh:"来源：Parasuraman, A., Zeithaml, V.A., Berry, L.L.（1988）《SERVQUAL多项目量表》，Journal of Retailing。"}},
+{type:'case', body:{
+  vi:"<strong>UPS</strong> nổi tiếng với chương trình đào tạo \"340 Methods\" – bộ quy chuẩn thao tác chuẩn hóa cho tài xế, bao gồm cả cách cầm chìa khóa, bước lên/xuống xe và cách chào khách nhằm tối ưu vừa tốc độ vừa hình ảnh chuyên nghiệp. <strong>Grab Express</strong> và các nền tảng giao hàng công nghệ tại Đông Nam Á áp dụng hệ thống đánh giá sao (rating) sau mỗi đơn hàng, biến từng tương tác giao tiếp của tài xế thành dữ liệu đo lường chất lượng dịch vụ theo thời gian thực – đây là minh chứng thực tế cho mô hình SERVQUAL trong vận hành hàng ngày.",
+  en:"<strong>UPS</strong> is well known for its \"340 Methods\" training — standardized procedures for drivers covering everything from how to hold keys to how to greet customers, optimizing both speed and professional image. <strong>Grab Express</strong> and other tech-enabled delivery platforms in Southeast Asia use post-delivery star ratings, turning every courier interaction into real-time service-quality data — a practical example of the SERVQUAL model in daily operations.",
+  zh:"<strong>UPS</strong>以其「340种方法」培训闻名——为司机制定的标准化操作规范，从握钥匙的方式到问候客户的方式，兼顾速度与专业形象。<strong>Grab Express</strong>等东南亚科技配送平台在每单完成后采用星级评分系统，将司机每一次沟通互动转化为实时的服务质量数据——这正是SERVQUAL模型在日常运营中的实际应用。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Quy chuẩn hành vi đối với kiện hàng của khách là gì?",en:"❓ 1. What is the standard for handling a customer's parcel?",zh:"❓ 1. 对待客户包裹的行为规范是什么？"},
+  a:{vi:"💡 Bưng bê bằng 2 tay, cẩn thận tuyệt đối không quăng quật hay kéo lê trên đất.",en:"💡 Carry with both hands, never throw or drag it on the ground.",zh:"💡 双手搬运，绝对不能扔摔或在地上拖拽。"}},
+ {q:{vi:"❓ 2. Vì sao yếu tố \"hữu hình\" (Tangibles) trong SERVQUAL quan trọng với tài xế giao hàng?",en:"❓ 2. Why does the \"Tangibles\" factor in SERVQUAL matter for delivery drivers?",zh:"❓ 2. 为什么SERVQUAL中的「有形性」因素对配送司机很重要？"},
+  a:{vi:"💡 Vì tài xế thường là điểm chạm duy nhất giữa khách hàng và thương hiệu (last-mile touchpoint).",en:"💡 Because the driver is often the only human touchpoint between the customer and the brand.",zh:"💡 因为司机往往是客户与品牌之间唯一的接触点（最后一公里触点）。"}},
+ {q:{vi:"❓ 3. Những hành vi nào tuyệt đối cấm khi tiếp xúc khách hàng?",en:"❓ 3. What behaviors are strictly forbidden when interacting with customers?",zh:"❓ 3. 与客户接触时绝对禁止哪些行为？"},
+  a:{vi:"💡 Tỏ thái độ gắt gỏng, bàn luận chuyện riêng tư, hoặc làm hư hỏng bao bì hàng hóa.",en:"💡 Being rude, discussing private matters, or damaging the packaging.",zh:"💡 态度粗暴、讨论隐私话题或损坏包装。"}}
+]}
+]
+},
+{
+id:'m3',
+title:{vi:"03 – Kỹ Năng Lái Xe An Toàn & Bảo Vệ Hàng Hóa", en:"03 – Safe Driving & Cargo Protection Skills", zh:"03 – 安全驾驶与货物保护技巧"},
+blocks:[
+{type:'list', heading:{vi:"1. Nguyên Tắc An Toàn Cốt Lõi (Defensive Driving)", en:"1. Core Safety Principles (Defensive Driving)", zh:"1. 核心安全原则（防御性驾驶）"},
+ items:[
+  {vi:"<strong>Kiểm tra xe & Thùng hàng trước chuyến đi:</strong> Lốp xe, phanh, đèn, khóa thùng xe, đảm bảo thùng xe khô ráo không rò rỉ nước.",
+   en:"<strong>Pre-trip vehicle & cargo box check:</strong> Tires, brakes, lights, box lock; ensure the cargo box is dry with no water leaks.",
+   zh:"<strong>行车前检查车辆与货厢：</strong>检查轮胎、刹车、车灯、货厢锁，确保货厢干燥不漏水。"},
+  {vi:"<strong>Giữ khoảng cách an toàn:</strong> Áp dụng quy tắc 3 giây (hoặc 6 giây khi trời mưa/đường trơn trượt) để tránh phanh gấp làm đổ vỡ hàng.",
+   en:"<strong>Keep a safe following distance:</strong> Apply the 3-second rule (or 6 seconds in rain/slippery roads) to avoid sudden braking that damages cargo.",
+   zh:"<strong>保持安全车距：</strong>采用3秒法则（雨天或路滑时为6秒），避免急刹导致货物损坏。"},
+  {vi:"<strong>Quan sát tầm xa (15-20 giây phía trước):</strong> Nhận diện sớm nguy cơ để giảm tốc nhẹ nhàng, bảo vệ chất lượng bưu kiện bên trong.",
+   en:"<strong>Scan ahead (15–20 seconds):</strong> Spot hazards early to slow down smoothly and protect the parcels inside.",
+   zh:"<strong>提前观察路况（15-20秒）：</strong>及早发现风险，平稳减速，保护车内货物质量。"},
+  {vi:"<strong>Tuân thủ quy định giao thông:</strong> Không chạy quá tốc độ, tuyệt đối không sử dụng điện thoại khi xe đang di chuyển.",
+   en:"<strong>Follow traffic laws:</strong> Never speed, and never use a phone while the vehicle is moving.",
+   zh:"<strong>遵守交通法规：</strong>不超速，行车途中绝对禁止使用手机。"}
+ ]},
+{type:'checklist', heading:{vi:"2. Checklist Vận Chuyển An Toàn", en:"2. Safe Transport Checklist", zh:"2. 安全运输检查清单"},
+ items:[
+  {vi:"☑ Chằng buộc, cố định kiện hàng cẩn thận trong thùng xe.",en:"☑ Secure and strap down parcels carefully inside the cargo box.",zh:"☑ 在货厢内仔细捆绑固定货物。"},
+  {vi:"☑ Hàng nặng xếp dưới, hàng nhẹ/dễ vỡ xếp trên.",en:"☑ Heavy items at the bottom, light/fragile items on top.",zh:"☑ 重物放下方，轻/易碎物品放上方。"},
+  {vi:"☑ Khóa chặt thùng xe trong suốt quá trình di chuyển.",en:"☑ Keep the cargo box locked throughout the trip.",zh:"☑ 行驶全程锁紧货厢。"},
+  {vi:"☑ Tuân thủ biển báo tốc độ và quy định cấm tải.",en:"☑ Obey speed signs and load restriction regulations.",zh:"☑ 遵守限速标志和限载规定。"}
+ ]},
+{type:'theory', body:{
+  vi:"Quy tắc <strong>3 giây</strong> (tăng lên 6 giây trong điều kiện xấu) được khuyến nghị bởi Cơ quan An toàn Giao thông Đường bộ Quốc gia Hoa Kỳ (<strong>NHTSA</strong>) như khoảng cách phanh an toàn tối thiểu. Chương trình <strong>Smith System</strong> – một trong những hệ thống đào tạo lái xe phòng vệ được sử dụng rộng rãi nhất trong ngành vận tải – đưa ra 5 nguyên tắc cốt lõi: (1) Nhắm xa để thấy toàn cảnh (Aim High in Steering), (2) Quan sát toàn cảnh (Get the Big Picture), (3) Luôn để mắt di chuyển (Keep Your Eyes Moving), (4) Chừa đường thoát hiểm (Leave Yourself an Out), (5) Đảm bảo người khác nhìn thấy mình (Make Sure They See You). Đối với vận chuyển bưu kiện, việc xếp hàng nặng bên dưới còn dựa trên nguyên lý <strong>trọng tâm thấp (low center of gravity)</strong> trong vật lý học – giúp xe ổn định hơn khi vào cua hoặc phanh gấp.",
+  en:"The <strong>3-second rule</strong> (extended to 6 seconds in adverse conditions) is recommended by the U.S. National Highway Traffic Safety Administration (<strong>NHTSA</strong>) as a minimum safe following distance. The <strong>Smith System</strong>, one of the most widely used defensive-driving training programs in the transport industry, sets out 5 core keys: Aim High in Steering, Get the Big Picture, Keep Your Eyes Moving, Leave Yourself an Out, and Make Sure They See You. For cargo loading, placing heavy items at the bottom is grounded in the physics principle of a <strong>low center of gravity</strong>, which keeps the vehicle more stable during turns or sudden braking.",
+  zh:"<strong>3秒法则</strong>（恶劣条件下延长至6秒）由美国国家公路交通安全管理局（<strong>NHTSA</strong>）建议作为最低安全跟车距离。运输行业广泛采用的防御性驾驶培训体系<strong>史密斯系统（Smith System）</strong>提出五大核心原则：瞄远转向、纵观全局、目光持续移动、留有退路、确保被他人看见。对于货物装载，重物放置于下方也基于物理学中的<strong>低重心原理</strong>，能让车辆在转弯或急刹时更加稳定。"
+ }, source:{vi:"Nguồn: NHTSA (National Highway Traffic Safety Administration); Smith System Driver Improvement Institute.",
+   en:"Sources: NHTSA (National Highway Traffic Safety Administration); Smith System Driver Improvement Institute.",
+   zh:"来源：NHTSA（美国国家公路交通安全管理局）；史密斯系统驾驶提升学院。"}},
+{type:'case', body:{
+  vi:"<strong>UPS</strong> áp dụng nguyên tắc \"seatbelt-key-mirror\" và huấn luyện tài xế theo chuẩn an toàn nội bộ nghiêm ngặt, được ghi nhận là một trong những đội xe có tỷ lệ tai nạn trên triệu dặm thấp nhất ngành vận tải Hoa Kỳ. <strong>DHL</strong> triển khai chương trình \"GoGreen\" kết hợp lái xe sinh thái (eco-driving) với an toàn – giảm tốc nhẹ nhàng vừa tiết kiệm nhiên liệu vừa bảo vệ hàng hóa dễ vỡ. Tại Việt Nam, <strong>Viettel Post</strong> và <strong>J&T Express</strong> đều trang bị camera hành trình (dashcam) và hệ thống giám sát tốc độ GPS cho đội xe tải liên tỉnh nhằm nhắc nhở tài xế duy trì khoảng cách và tốc độ an toàn theo thời gian thực.",
+  en:"<strong>UPS</strong> applies the \"seatbelt-key-mirror\" habit and strict internal safety training, and is recognized for having one of the lowest accident rates per million miles in the U.S. transport industry. <strong>DHL's</strong> \"GoGreen\" program combines eco-driving with safety — gentle deceleration both saves fuel and protects fragile cargo. In Vietnam, <strong>Viettel Post</strong> and <strong>J&T Express</strong> equip their inter-provincial trucks with dashcams and GPS speed-monitoring systems to remind drivers to maintain safe distance and speed in real time.",
+  zh:"<strong>UPS</strong>采用「安全带-钥匙-后视镜」习惯并进行严格的内部安全培训，其车队每百万英里事故率位居美国运输业最低之列。<strong>DHL</strong>的「GoGreen」计划将生态驾驶与安全结合——平稳减速既节省燃油又能保护易碎货物。在越南，<strong>Viettel Post</strong>和<strong>J&T Express</strong>都为省际货车配备行车记录仪和GPS测速监控系统，实时提醒司机保持安全车距与车速。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Nguyên tắc xếp dỡ hàng hóa trong thùng xe tải SF là gì?",en:"❓ 1. What is the loading principle for SF cargo trucks?",zh:"❓ 1. 顺丰货车装卸货物的原则是什么？"},
+  a:{vi:"💡 Hàng nặng/cồng kềnh xếp ở dưới, hàng nhẹ/dễ vỡ xếp phía trên và chằng buộc chắc chắn.",en:"💡 Heavy/bulky items at the bottom, light/fragile items on top, all secured tightly.",zh:"💡 重物/大件放下方，轻/易碎物品放上方，并牢固捆绑。"}},
+ {q:{vi:"❓ 2. Quy tắc 3 giây trong lái xe an toàn đến từ đâu?",en:"❓ 2. Where does the 3-second driving rule originate from?",zh:"❓ 2. 驾驶中的3秒法则来自哪里？"},
+  a:{vi:"💡 Khuyến nghị của NHTSA (Mỹ) về khoảng cách an toàn tối thiểu giữa hai xe.",en:"💡 A recommendation from the U.S. NHTSA for the minimum safe following distance.",zh:"💡 美国NHTSA关于车辆间最小安全距离的建议。"}},
+ {q:{vi:"❓ 3. Yêu cầu bắt buộc đối với thùng xe chở hàng trước khi di chuyển?",en:"❓ 3. What is mandatory for the cargo box before departure?",zh:"❓ 3. 出车前对货厢有什么强制性要求？"},
+  a:{vi:"💡 Kiểm tra sàn sạch/khô, đóng và khóa thùng cẩn thận để tránh rơi rớt/mất mát.",en:"💡 Check the floor is clean/dry, and close and lock the box to prevent loss.",zh:"💡 检查地板干净干燥，仔细关闭并锁好货厢以防丢失。"}}
+]}
+]
+}
+];
+</script>
+<script>
+MODULES.push(
+{
+id:'m4',
+title:{vi:"04 – Kỹ Năng Xử Lý Tình Huống Hàng Hóa & Khách Hàng", en:"04 – Handling Cargo & Customer Situations", zh:"04 – 货物与客户突发情况处理"},
+blocks:[
+{type:'scenario', heading:{vi:"Kịch Bản Xử Lý Tình Huống Thực Tế", en:"Real-World Scenario Handling", zh:"实际情境处理案例"},
+ rows:[
+  {q:{vi:"1. Khách khiếu nại bưu kiện móp méo / Hàng sự cố",en:"1. Customer complains about a dented/damaged parcel",zh:"1. 客户投诉包裹凹陷/破损"},
+   p:{vi:"Bình tĩnh, không tranh cãi. Lắng nghe, cùng khách kiểm tra ngoại quan, lập biên bản sự cố và báo CS/Điều hành.",en:"Stay calm, don't argue. Listen, inspect the parcel together with the customer, file an incident report, and notify CS/Operations.",zh:"保持冷静，不要争辩。倾听客户意见，共同检查外观，填写事故记录并上报客服/调度。"},
+   a:{vi:"<i>\"Em rất tiếc về sự cố vỏ hộp này. Em xin phép chụp ảnh hiện trạng và báo ngay về bộ phận CS để xử lý quyền lợi cho mình ạ.\"</i>",en:"<i>\"I'm sorry about the box condition. Let me take a photo and report it to our CS team right away to resolve this for you.\"</i>",zh:"<i>\"很抱歉包装出现这个情况，我马上拍照并上报客服部门，为您处理相关权益。\"</i>"}},
+  {q:{vi:"2. Xe gặp sự cố kỹ thuật / Va chạm trên đường",en:"2. Vehicle breakdown / collision on the road",zh:"2. 车辆发生故障/交通事故"},
+   p:{vi:"Bật đèn khẩn cấp, tấp xe an toàn. Bảo vệ niêm phong và an toàn hàng hóa trên xe. Báo Điều hành điều xe cứu hộ/chuyển tải.",en:"Turn on hazard lights, pull over safely. Protect the seal and safety of the cargo. Notify Operations for rescue/transshipment.",zh:"打开双闪灯，安全靠边停车。保护货物封条与安全，并上报调度请求救援/转运。"},
+   a:{vi:"Báo ngay Điều hành: <i>\"Xe gặp sự cố tại vị trí X, hàng hóa an toàn, cần xe hỗ trợ chuyển tải gấp để kịp ca giao.\"</i>",en:"Notify Operations immediately: <i>\"The vehicle broke down at location X, cargo is safe, need urgent transshipment support to meet the delivery shift.\"</i>",zh:"立即上报调度：\"车辆在X地点发生故障，货物安全，急需支援转运以赶上派送班次。\""}},
+  {q:{vi:"3. Kẹt xe / Nguy cơ trễ giờ giao hàng hẹn trước",en:"3. Traffic jam / risk of missing a scheduled delivery time",zh:"3. 交通拥堵/有延误预约送货的风险"},
+   p:{vi:"Chủ động kiểm tra danh sách đơn hàng, gọi điện thông báo trước cho người nhận và cập nhật hệ thống.",en:"Proactively check the delivery list, call the recipient in advance, and update the system.",zh:"主动检查订单清单，提前致电收件人告知，并更新系统。"},
+   a:{vi:"<i>\"Dạ em chào Anh/Chị, em là tài xế SF Express. Tuyến đường đang kẹt xe nghiêm trọng, em xin phép giao muộn khoảng 20 phút được không ạ?\"</i>",en:"<i>\"Hello, this is your SF Express driver. There's heavy traffic on my route — may I deliver about 20 minutes later than planned?\"</i>",zh:"\"您好，我是顺丰速运司机，目前路上严重拥堵，请问可以晚约20分钟送达吗？\""}},
+  {q:{vi:"4. Khách hàng xuất khẩu không đồng ý cho mở kiểm tra hàng đối chiếu Invoice",en:"4. Export customer refuses to let staff open the cargo to check against the Invoice",zh:"4. 出口客户不同意开箱核对发票（Invoice）"},
+   p:{vi:"Nhã nhặn giải thích lý do cần đồng kiểm để đảm bảo thông tin khai báo chính xác, giúp lô hàng thông quan và xuất khẩu nhanh chóng, thuận lợi. Nếu khách vẫn từ chối, ghi nhận lại và báo cáo cấp trên/CS để được hướng dẫn xử lý thêm.",en:"Politely explain that joint inspection ensures accurate customs declaration and speeds up smooth clearance and export. If the customer still refuses, note it down and report to a supervisor/CS for further guidance.",zh:"礼貌解释验货核对是为确保申报信息准确，帮助货物顺利、快速通关出口。若客户仍拒绝，记录情况并上报上级/客服以获取进一步指导。"},
+   a:{vi:"<i>\"Nhằm phục vụ hỗ trợ hàng hoá của quý Anh/Chị được thông quan và xuất khẩu nhanh nhất có thể, em xin phép được mở kiểm hàng hoá cùng với Anh/Chị để được cùng hỗ trợ nếu cần điều chỉnh về thông tin khai báo trên Invoice ạ.\"</i>",en:"<i>\"To help your shipment clear customs and be exported as quickly as possible, may I open and inspect the cargo together with you, so we can assist right away if the Invoice information needs adjusting?\"</i>",zh:"\"为了协助您的货物尽快通关出口，请允许我与您一同开箱核对，以便在发票申报信息需要调整时能立即为您处理。\""}}
+ ]},
+{type:'list', heading:{vi:"2. Quy Định Hàng Hóa Xuất Khẩu Cần Lưu Ý", en:"2. Export Cargo Regulations to Note", zh:"2. 出口货物需注意的相关规定"},
+ items:[
+  {vi:"<strong>Hàng cấm vận chuyển:</strong> Pin Lithium-ion/kim loại rời, ngà voi, sừng và các sản phẩm từ động vật hoang dã cùng các mặt hàng cấm khác theo quy định — tuyệt đối không nhận vận chuyển.",
+   en:"<strong>Prohibited items:</strong> Loose lithium-ion/lithium-metal batteries, ivory, horns, and other wildlife products, along with other banned items per regulations — never accept these for shipment.",
+   zh:"<strong>禁运物品：</strong>散装锂离子/锂金属电池、象牙、犀牛角及其他野生动物制品，以及其他违禁物品——一律不得收运。"},
+  {vi:"<strong>Hàng giá trị cao / khối lượng lớn:</strong> Hàng có giá trị khai báo trên 5.000.000 VNĐ hoặc lô hàng trên 50kg bắt buộc phải lên tờ khai hải quan xuất khẩu theo quy định.",
+   en:"<strong>High-value / large shipments:</strong> Cargo declared over 5,000,000 VND or shipments over 50kg must have an export customs declaration filed as required.",
+   zh:"<strong>高价值/大批量货物：</strong>申报价值超过500万越南盾或货重超过50公斤的货物，必须按规定办理出口报关单。"},
+  {vi:"<strong>Hàng dễ vỡ, hàng lỏng:</strong> Phải được chèn lót và sử dụng vật liệu thấm hút đúng quy cách trước khi đóng gói.",
+   en:"<strong>Fragile / liquid items:</strong> Must be cushioned and packed with proper absorbent material before sealing.",
+   zh:"<strong>易碎品、液体：</strong>装箱前必须按规定使用缓冲填充物和吸水材料。"},
+  {vi:"<strong>Hàng đóng kiện/pallet gỗ:</strong> Bắt buộc kèm theo Chứng thư hun trùng (Fumigation Certificate) bản gốc.",
+   en:"<strong>Wooden crates/pallets:</strong> Must be accompanied by an original Fumigation Certificate.",
+   zh:"<strong>木质栈板/木箱包装：</strong>必须附上熏蒸证书（Fumigation Certificate）原件。"},
+  {vi:"<strong>Hàng đóng pallet:</strong> Tạm thời không được xuất qua các sân bay SZX (Thâm Quyến) hoặc PVG (Phố Đông – Thượng Hải) theo quy định hiện hành của hãng bay.",
+   en:"<strong>Palletized cargo:</strong> Currently not accepted for export via SZX (Shenzhen) or PVG (Shanghai Pudong) airports under current airline regulations.",
+   zh:"<strong>栈板货物：</strong>根据航空公司现行规定，暂时不能经由深圳（SZX）或上海浦东（PVG）机场出口。"},
+  {vi:"<strong>Đổi cảng xuất theo yêu cầu khách:</strong> Khi khách yêu cầu chuyển cảng xuất (ví dụ đổi từ SZX sang PVG), nhân viên giao nhận phải hỗ trợ thực hiện đúng theo yêu cầu của khách.",
+   en:"<strong>Changing the export port at the customer's request:</strong> If the customer requests a different export port (e.g., from SZX to PVG), staff must support the change as requested.",
+   zh:"<strong>按客户要求更改出口口岸：</strong>若客户要求更改出口口岸（例如由SZX改为PVG），收派员须按客户要求予以协助办理。"}
+ ]},
+{type:'theory', body:{
+  vi:"<strong>Mô hình LAST</strong> (Listen – Apologize – Solve – Thank) là khung xử lý khiếu nại phổ biến trong ngành dịch vụ khách hàng: Lắng nghe trọn vẹn vấn đề, Xin lỗi chân thành (không đổ lỗi), Giải quyết bằng hành động cụ thể, và Cảm ơn khách vì đã phản hồi. Bên cạnh đó, mô hình <strong>OODA Loop</strong> (Observe – Orient – Decide – Act, do Đại tá John Boyd, Không quân Hoa Kỳ phát triển) thường được áp dụng trong xử lý tình huống khẩn cấp trên đường: Quan sát hiện trường → Định hướng mức độ nghiêm trọng → Quyết định phương án → Hành động ngay, giúp tài xế phản ứng có hệ thống thay vì hoảng loạn khi gặp sự cố.",
+  en:"The <strong>LAST model</strong> (Listen – Apologize – Solve – Thank) is a common complaint-handling framework in customer service: fully listen to the issue, apologize sincerely (without blaming), solve it with concrete action, and thank the customer for the feedback. The <strong>OODA Loop</strong> (Observe – Orient – Decide – Act, developed by USAF Colonel John Boyd) is often applied to roadside emergencies: observe the scene → assess severity → decide on a course of action → act immediately, helping drivers respond systematically rather than panicking.",
+  zh:"<strong>LAST模型</strong>（倾听-道歉-解决-感谢）是客户服务中常见的投诉处理框架：充分倾听问题、真诚道歉（不推卸责任）、以具体行动解决问题、并感谢客户的反馈。<strong>OODA循环</strong>（观察-调整-决策-行动，由美国空军上校John Boyd提出）常用于处理路上突发状况：观察现场→判断严重程度→决定应对方案→立即行动，帮助司机系统化应对而非惊慌失措。"
+ }, source:{vi:"Nguồn: mô hình LAST – khung xử lý khiếu nại phổ biến trong đào tạo dịch vụ khách hàng; Boyd, J. (Không quân Hoa Kỳ) OODA Loop.",
+   en:"Sources: LAST model, a widely used customer-service complaint framework; Boyd, J. (USAF) OODA Loop.",
+   zh:"来源：LAST模型，广泛用于客户服务培训的投诉处理框架；Boyd, J.（美国空军）OODA循环。"}},
+{type:'case', body:{
+  vi:"<strong>Amazon Logistics</strong> áp dụng nguyên tắc \"Customer Obsession\" – ưu tiên giải quyết vấn đề của khách trước, xử lý trách nhiệm nội bộ sau, giúp rút ngắn thời gian phản hồi khiếu nại. <strong>Ninja Van</strong> (hoạt động tại Đông Nam Á, gồm Việt Nam) xây dựng quy trình báo cáo sự cố qua ứng dụng nội bộ cho tài xế ngay tại hiện trường, tự động định tuyến lại đơn hàng khi phát hiện chậm trễ. Đây là minh chứng cho việc kết hợp con người (kỹ năng xử lý tình huống) với công nghệ (hệ thống định tuyến tự động) trong vận hành logistics hiện đại.",
+  en:"<strong>Amazon Logistics</strong> applies \"Customer Obsession\" — resolving the customer's problem first, sorting out internal accountability afterward, which shortens complaint response time. <strong>Ninja Van</strong> (operating across Southeast Asia, including Vietnam) built an in-app incident reporting flow for drivers at the scene, automatically rerouting orders when delays are detected — an example of combining human situational skills with automated routing technology in modern logistics.",
+  zh:"<strong>亚马逊物流（Amazon Logistics）</strong>秉持「客户至上」原则——优先解决客户问题，事后再厘清内部责任，从而缩短投诉响应时间。<strong>Ninja Van</strong>（在包括越南在内的东南亚地区运营）为司机建立了现场App事故上报流程，一旦发现延误即自动重新规划路线——这体现了现代物流运营中人工处理能力与自动化路由技术的结合。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Cần làm gì khi phát hiện hàng hóa bị hư hỏng/móp méo lúc giao hàng?",en:"❓ 1. What should you do when you find damaged/dented cargo during delivery?",zh:"❓ 1. 派送时发现货物破损/凹陷该怎么办？"},
+  a:{vi:"💡 Giữ thái độ bình tĩnh, chụp ảnh hiện trạng, ghi nhận lên biên bản/hệ thống và báo điều hành/CS.",en:"💡 Stay calm, photograph the condition, log it in the report/system, and notify Operations/CS.",zh:"💡 保持冷静，拍照记录现状，登记到记录/系统中，并上报调度/客服。"}},
+ {q:{vi:"❓ 2. Bước đầu tiên trong mô hình LAST khi xử lý khiếu nại là gì?",en:"❓ 2. What is the first step in the LAST model for complaint handling?",zh:"❓ 2. LAST投诉处理模型的第一步是什么？"},
+  a:{vi:"💡 Listen – Lắng nghe trọn vẹn vấn đề của khách trước khi phản hồi.",en:"💡 Listen – fully hear the customer's issue before responding.",zh:"💡 倾听（Listen）——在回应前充分了解客户的问题。"}},
+ {q:{vi:"❓ 3. Phải làm gì khi dự đoán không thể đến giao hàng đúng giờ hẹn?",en:"❓ 3. What should you do if you anticipate missing the scheduled delivery time?",zh:"❓ 3. 预计无法按约定时间送达时该怎么办？"},
+  a:{vi:"💡 Gọi điện xin lỗi và hẹn lại thời gian cụ thể với khách hàng trước khi trễ hạn.",en:"💡 Call to apologize and give a specific new time before the deadline passes.",zh:"💡 提前致电道歉，并告知客户具体的新送达时间。"}}
+]}
+]
+},
+{
+id:'m5',
+title:{vi:"05 – Kỹ Năng Quản Lý Thời Gian & Lịch Trình Giao Hàng", en:"05 – Time & Delivery Schedule Management", zh:"05 – 时间与派送计划管理"},
+blocks:[
+{type:'list', heading:{vi:"1. Nguyên Tắc Quản Lý Lịch Trình Tối Ưu", en:"1. Principles of Optimal Schedule Management", zh:"1. 高效日程管理原则"},
+ items:[
+  {vi:"<strong>Lập kế hoạch tuyến đường (Route Optimization):</strong> Sắp xếp thứ tự các điểm lấy/giao hàng theo lộ trình ngắn nhất và hợp lý nhất trước khi xuất kho.",
+   en:"<strong>Route Optimization:</strong> Sequence pickup/delivery stops along the shortest, most logical route before leaving the depot.",
+   zh:"<strong>路线优化：</strong>出库前按最短、最合理的路线安排取送货顺序。"},
+  {vi:"<strong>Tuân thủ khung giờ Cut-off & Lịch hẹn:</strong> Đảm bảo lấy hàng kịp thời gian xuất chuyến cố định và giao đúng khung giờ cam kết với khách.",
+   en:"<strong>Follow Cut-off times & appointments:</strong> Ensure pickups meet the fixed dispatch time and deliveries meet the committed time window.",
+   zh:"<strong>遵守截单时间与预约：</strong>确保按固定发车时间完成取件，并在承诺的时间段内送达。"},
+  {vi:"<strong>Cam kết giờ hẹn với khách hàng:</strong> Khi khách hẹn giờ cụ thể để giao/nhận hàng (VD: 10:00 sáng hôm sau), nhân viên phải chủ động sắp xếp lịch trình để đáp ứng đúng hẹn, lấy khách hàng làm trọng tâm. Trường hợp bất khả kháng không thể sắp xếp được, phải chủ động gọi điện thông báo, thỏa thuận lại và chỉ thay đổi khi nhận được sự đồng ý của khách.",
+   en:"<strong>Honoring appointment times with customers:</strong> When a customer sets a specific pickup/delivery time (e.g., 10:00 AM the next day), staff must proactively arrange their schedule to meet it, keeping the customer at the center. If this is truly impossible, staff must proactively call to explain, renegotiate, and only change the plan once the customer agrees.",
+   zh:"<strong>信守与客户的预约时间：</strong>当客户约定具体的取/送货时间（例如次日上午10:00）时，员工须主动调整行程以准时履约，坚持以客户为中心。如确实存在不可抗力无法按约定完成，须主动致电说明并重新协商，仅在获得客户同意后才可变更安排。"},
+  {vi:"<strong>Nghỉ ngơi khoa học:</strong> Không lái xe liên tục quá 4 giờ; nghỉ 15-20 phút giữa ca để giữ sự tỉnh táo.",
+   en:"<strong>Scientific rest breaks:</strong> Do not drive continuously for more than 4 hours; rest 15–20 minutes between shifts to stay alert.",
+   zh:"<strong>科学休息：</strong>连续驾驶不超过4小时；每班次间休息15-20分钟保持清醒。"}
+ ]},
+{type:'list', heading:{vi:"2. Tối Ưu Thời Gian Vận Hành Dịch Vụ", en:"2. Optimizing Service Operation Time", zh:"2. 服务运营时间优化"},
+ items:[
+  {vi:"Bảo dưỡng, rửa xe, nạp nhiên liệu vào khoảng thời gian nghỉ giữa ca hoặc ngoài giờ cao điểm giao nhận.",en:"Do maintenance, washing, and refueling during breaks or off-peak hours.",zh:"在班次休息或非高峰时段进行保养、洗车和加油。"},
+  {vi:"Cập nhật ngay trạng thái giao hàng trên APP để Điều hành và Khách hàng theo dõi realtime.",en:"Update delivery status on the app immediately so Operations and customers can track it in real time.",zh:"立即在App上更新派送状态，方便调度和客户实时跟踪。"}
+ ]},
+{type:'theory', body:{
+  vi:"<strong>Ma trận Eisenhower</strong> (được đặt theo tên Tổng thống Dwight D. Eisenhower) phân loại công việc theo 2 trục Khẩn cấp – Quan trọng, giúp tài xế ưu tiên xử lý đơn hàng có khung giờ Cut-off gần nhất trước, thay vì xử lý theo thứ tự nhận việc ngẫu nhiên. Về mặt vận hành, bài toán sắp xếp lộ trình giao nhận tối ưu (tối thiểu hóa quãng đường qua tất cả các điểm) chính là dạng ứng dụng thực tế của bài toán <strong>Vehicle Routing Problem (VRP)</strong> trong toán tối ưu – nền tảng thuật toán cho hầu hết phần mềm định tuyến giao hàng hiện nay. Về giới hạn giờ lái xe, nhiều quốc gia (bao gồm quy định vận tải đường bộ tại Việt Nam) giới hạn thời gian lái xe liên tục ở mức 4 giờ nhằm giảm nguy cơ tai nạn do mất tập trung/buồn ngủ.",
+  en:"The <strong>Eisenhower Matrix</strong> (named after President Dwight D. Eisenhower) sorts tasks along Urgent–Important axes, helping drivers prioritize orders with the nearest cut-off time rather than handling them in random order. Operationally, optimizing delivery routes (minimizing total distance across all stops) is a real-world application of the <strong>Vehicle Routing Problem (VRP)</strong> in optimization mathematics — the algorithmic foundation behind most modern delivery-routing software. Regarding driving-hour limits, many countries (including Vietnam's road transport regulations) cap continuous driving at 4 hours to reduce accident risk from fatigue and loss of focus.",
+  zh:"<strong>艾森豪威尔矩阵</strong>（以美国总统德怀特·艾森豪威尔命名）按「紧急-重要」两个维度对任务分类，帮助司机优先处理截单时间最近的订单，而非按随机顺序处理。在运营层面，优化派送路线（使途经所有站点的总里程最小化）正是运筹优化中<strong>车辆路径问题（VRP）</strong>的实际应用——这是当今大多数派送路线软件的算法基础。关于驾驶时长限制，包括越南道路运输法规在内的许多国家都将连续驾驶时间限制在4小时以内，以降低因疲劳/注意力不集中导致的事故风险。"
+ }, source:{vi:"Nguồn: Eisenhower Matrix (mô hình quản lý thời gian phổ biến); Dantzig, G. & Ramser, J. (1959) The Truck Dispatching Problem – nền tảng lý thuyết VRP; quy định về thời gian lái xe liên tục trong vận tải đường bộ.",
+   en:"Sources: Eisenhower Matrix (popular time-management model); Dantzig, G. & Ramser, J. (1959) The Truck Dispatching Problem – foundation of VRP theory; road transport regulations on continuous driving hours.",
+   zh:"来源：艾森豪威尔矩阵（常见的时间管理模型）；Dantzig, G. & Ramser, J.（1959）《卡车调度问题》——VRP理论基础；道路运输关于连续驾驶时间的法规。"}},
+{type:'case', body:{
+  vi:"<strong>DHL</strong> và <strong>FedEx</strong> đều sử dụng phần mềm định tuyến tự động dựa trên thuật toán VRP để tính lộ trình tối ưu cho hàng nghìn điểm giao nhận mỗi ngày, giảm đáng kể quãng đường di chuyển thừa. Tại Việt Nam, <strong>Giao Hàng Tiết Kiệm (GHTK)</strong> và <strong>J&T Express</strong> áp dụng hệ thống phân tuyến tự động (auto-routing) kết hợp với khung giờ Cut-off theo từng bưu cục để tối đa hóa số đơn giao trong ca làm việc. Nguyên tắc chung của các doanh nghiệp hàng đầu là: công nghệ hỗ trợ tính toán lộ trình, còn con người (tài xế) quyết định điều chỉnh linh hoạt theo tình huống thực tế trên đường.",
+  en:"Both <strong>DHL</strong> and <strong>FedEx</strong> use automated routing software based on VRP algorithms to calculate optimal routes for thousands of daily stops, significantly cutting wasted travel distance. In Vietnam, <strong>Giao Hang Tiet Kiem (GHTK)</strong> and <strong>J&T Express</strong> use auto-routing systems combined with per-hub cut-off times to maximize deliveries per shift. The common principle among leading companies: technology computes the route, while the human driver makes real-time adjustments as road conditions change.",
+  zh:"<strong>DHL</strong>和<strong>联邦快递</strong>均使用基于VRP算法的自动路线规划软件，为每天数千个收发点计算最优路线，大幅减少无效行驶里程。在越南，<strong>Giao Hang Tiet Kiem（GHTK）</strong>和<strong>J&T Express</strong>采用自动分单系统，并结合各网点的截单时间，最大化每班次的派送量。行业领先企业的共同原则是：技术负责计算路线，而司机（人）根据路上实际情况灵活调整。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Việc sắp xếp thứ tự đơn hàng trước khi rời kho mang lại lợi ích gì?",en:"❓ 1. What is the benefit of sequencing orders before leaving the depot?",zh:"❓ 1. 出库前对订单排序有什么好处？"},
+  a:{vi:"💡 Tiết kiệm thời gian di chuyển, giảm chi phí nhiên liệu và đảm bảo tỷ lệ giao hàng đúng giờ.",en:"💡 Saves travel time, reduces fuel cost, and improves on-time delivery rate.",zh:"💡 节省行车时间，降低油耗，并保障准时派送率。"}},
+ {q:{vi:"❓ 2. Bài toán tối ưu lộ trình giao hàng trong toán học được gọi là gì?",en:"❓ 2. What is the mathematical name for the delivery route optimization problem?",zh:"❓ 2. 派送路线优化在数学中被称为什么问题？"},
+  a:{vi:"💡 Vehicle Routing Problem (VRP) – Bài toán định tuyến phương tiện.",en:"💡 The Vehicle Routing Problem (VRP).",zh:"💡 车辆路径问题（VRP）。"}},
+ {q:{vi:"❓ 3. Cần làm gì ngay khi hoàn thành giao một kiện hàng?",en:"❓ 3. What should you do right after completing a delivery?",zh:"❓ 3. 完成一单派送后应立即做什么？"},
+  a:{vi:"💡 Cập nhật ngay trạng thái \"Đã giao thành công\" lên ứng dụng vận hành.",en:"💡 Immediately update the \"Delivered successfully\" status on the operations app.",zh:"💡 立即在运营App上更新「已成功送达」状态。"}}
+]}
+]
+},
+{
+id:'m6',
+title:{vi:"06 – Kỹ Năng Làm Việc Nhóm & Phối Hợp Vận Hành", en:"06 – Teamwork & Operational Coordination Skills", zh:"06 – 团队协作与运营协调技巧"},
+blocks:[
+{type:'list', heading:{vi:"1. Hợp Tác Trong Chuỗi Logistics SF Express", en:"1. Collaboration Across the SF Express Logistics Chain", zh:"1. 顺丰速运物流链中的协作"},
+ items:[
+  {vi:"<strong>Phối hợp với Bộ phận Điều hành:</strong> Cập nhật trạng thái chuyến đi kịp thời (Đã lấy hàng, Đang vận chuyển, Đã hoàn thành). Báo cáo ngay khi có phát sinh thay đổi lộ trình.",en:"<strong>Coordinate with Operations:</strong> Update trip status promptly (Picked up, In transit, Completed). Report immediately when the route changes.",zh:"<strong>与调度部门协作：</strong>及时更新行程状态（已取件、运输中、已完成）。路线变更时立即上报。"},
+  {vi:"<strong>Phối hợp với Nhân viên Kho / Chia chọn hàng (Sorter/Warehouse):</strong> Phân công kiểm đếm, đối soát số lượng bưu kiện, ký nhận bàn giao hàng hóa chính xác.",en:"<strong>Coordinate with Warehouse/Sorting staff:</strong> Count and reconcile parcel quantities, and sign off handovers accurately.",zh:"<strong>与仓库/分拣人员协作：</strong>清点核对包裹数量，准确签收交接货物。"},
+  {vi:"<strong>Hỗ trợ Đồng nghiệp (Đội ngũ tài xế):</strong> Chia sẻ thông tin giao thông, tuyến đường cấm/ngập nước; hỗ trợ đồng nghiệp cứu hộ hàng hóa khi gặp sự cố trên đường.",en:"<strong>Support fellow drivers:</strong> Share traffic info and flooded/restricted routes; help rescue cargo when a colleague has an incident.",zh:"<strong>支持同事（司机团队）：</strong>共享交通信息、禁行/积水路段；同事出现状况时协助抢救货物。"},
+  {vi:"<strong>Hỗ trợ khi đồng nghiệp nghỉ phép/nghỉ đột xuất:</strong> Có tinh thần hỗ trợ, tuân theo sự điều động sắp xếp tuyến đường từ quản lý để đảm bảo không ảnh hưởng dịch vụ của các đơn giao/nhận hàng trên tuyến mà đồng nghiệp đó phụ trách.",en:"<strong>Covering for colleagues on leave/sudden absence:</strong> Maintain a supportive spirit and follow the route reassignment arranged by the manager to ensure the delivery/pickup service on that colleague's route is not affected.",zh:"<strong>同事请假或临时缺勤时的支援：</strong>发扬互助精神，服从主管对路线的重新调度安排，确保该同事负责的收派线路服务不受影响。"}
+ ]},
+{type:'list', heading:{vi:"2. Văn Hóa Ứng Xử Tổ Chức", en:"2. Organizational Culture & Conduct", zh:"2. 组织行为文化"},
+ items:[
+  {vi:"Bàn giao ca xe đầy đủ: Kiểm tra nhiên liệu, vệ sinh cabin/thùng xe, tình trạng kỹ thuật và giấy tờ xe.",en:"Full shift handover: check fuel, clean the cabin/cargo box, technical condition, and vehicle documents.",zh:"完整交接班：检查油量、清洁驾驶室/货厢、车辆技术状况和相关证件。"},
+  {vi:"Góp ý tích cực trong các buổi họp đội xe nhằm nâng cao tỷ lệ giao hàng thành công (PCR).",en:"Give constructive feedback in fleet meetings to improve the Parcel Completion Rate (PCR).",zh:"在车队会议上积极建言，以提升派送成功率（PCR）。"}
+ ]},
+{type:'theory', body:{
+  vi:"<strong>Mô hình phát triển nhóm Tuckman</strong> (Bruce Tuckman, 1965) mô tả 5 giai đoạn một đội nhóm trải qua: Hình thành (Forming) – Xung đột (Storming) – Chuẩn hóa (Norming) – Vận hành hiệu quả (Performing) – Kết thúc (Adjourning). Đội xe SF Express, dù luân chuyển ca kíp liên tục, vẫn cần đạt giai đoạn \"Norming/Performing\" thông qua quy trình bàn giao chuẩn hóa và kênh liên lạc chung (nhóm chat đội xe), giúp giảm thời gian \"làm quen lại\" mỗi khi đổi ca. Ngoài ra, khái niệm <strong>PCR (Parcel Completion Rate – Tỷ lệ giao hàng thành công)</strong> là một chỉ số KPI phổ biến trong ngành logistics, phản ánh trực tiếp hiệu quả phối hợp giữa tài xế – kho – điều hành, vì một đơn hàng thất bại thường xuất phát từ đứt gãy thông tin ở một trong ba mắt xích này.",
+  en:"<strong>Tuckman's stages of group development</strong> (Bruce Tuckman, 1965) describe 5 phases a team goes through: Forming – Storming – Norming – Performing – Adjourning. Even with constant shift rotation, an SF Express fleet needs to reach the \"Norming/Performing\" stage through standardized handover procedures and a shared communication channel (fleet group chat), reducing the \"re-familiarization\" time at every shift change. The <strong>Parcel Completion Rate (PCR)</strong> is a common logistics KPI that directly reflects coordination quality between driver, warehouse, and operations — a failed delivery usually stems from a breakdown in communication at one of these three links.",
+  zh:"<strong>塔克曼团队发展阶段模型</strong>（Bruce Tuckman，1965年）描述团队经历的五个阶段：形成期（Forming）—震荡期（Storming）—规范期（Norming）—高效期（Performing）—解散期（Adjourning）。顺丰车队虽然频繁轮班，仍需通过标准化交接流程与共同沟通渠道（车队群聊）达到「规范期/高效期」，从而减少每次换班的「重新磨合」时间。<strong>派送完成率（PCR, Parcel Completion Rate）</strong>是物流行业常见的KPI指标，直接反映司机-仓库-调度三方协作的效果，因为派送失败通常源于这三个环节之一的信息断层。"
+ }, source:{vi:"Nguồn: Tuckman, B.W. (1965) Developmental Sequence in Small Groups, Psychological Bulletin.",
+   en:"Source: Tuckman, B.W. (1965) Developmental Sequence in Small Groups, Psychological Bulletin.",
+   zh:"来源：Tuckman, B.W.（1965）《小群体的发展序列》，Psychological Bulletin。"}},
+{type:'case', body:{
+  vi:"<strong>SF Express (顺丰速运)</strong> tại Trung Quốc vận hành mô hình \"trực doanh\" (self-operated network) thay vì nhượng quyền hoàn toàn như một số đối thủ, giúp kiểm soát chất lượng phối hợp giữa các mắt xích kho vận – tài xế chặt chẽ hơn, đây được xem là một trong những yếu tố tạo nên tốc độ giao hàng nhanh của thương hiệu. <strong>Zappos</strong> (thuộc Amazon) nổi tiếng với văn hóa \"đồng đội trước, cái tôi sau\" trong dịch vụ khách hàng và vận hành kho. Tại Việt Nam, các bưu cục của <strong>Viettel Post</strong> và <strong>SF Express Việt Nam</strong> áp dụng mô hình họp giao ca đầu ngày (briefing) để đồng bộ thông tin về đơn hàng ưu tiên, tuyến đường thay đổi và các lưu ý đặc biệt trong ngày.",
+  en:"<strong>SF Express</strong> in China operates a self-operated network model rather than full franchising like some competitors, allowing tighter coordination between warehouse and driver operations — considered one of the reasons for the brand's fast delivery speed. <strong>Zappos</strong> (an Amazon company) is well known for its \"team over ego\" culture in customer service and warehouse operations. In Vietnam, <strong>Viettel Post</strong> and <strong>SF Express Vietnam</strong> hubs hold daily morning briefings to align staff on priority orders, route changes, and special notes for the day.",
+  zh:"<strong>顺丰速运</strong>在中国采用「直营」模式，而非像部分竞争对手那样完全加盟，使仓配与司机环节的协作控制更加紧密，这被视为该品牌配送速度快的原因之一。<strong>Zappos</strong>（隶属亚马逊）以其客户服务和仓库运营中「团队优先于自我」的文化而闻名。在越南，<strong>Viettel Post</strong>和<strong>顺丰速运越南</strong>的网点均采用每日晨会（briefing）机制，同步优先订单、路线变更及当日特别注意事项。"
+ }},
+{type:'flashcards', items:[
+ {q:{vi:"❓ 1. Trách nhiệm chính khi làm việc với nhân viên kho (Warehouse) là gì?",en:"❓ 1. What is the main responsibility when working with warehouse staff?",zh:"❓ 1. 与仓库人员协作时的主要职责是什么？"},
+  a:{vi:"💡 Kiểm đếm chính xác số lượng, tình trạng tem nhãn và ký bàn giao bưu kiện rõ ràng.",en:"💡 Accurately count quantities, check label condition, and sign off the handover clearly.",zh:"💡 准确清点数量、检查标签状态，并清楚签收交接货物。"}},
+ {q:{vi:"❓ 2. PCR trong logistics là viết tắt của chỉ số nào?",en:"❓ 2. What does PCR stand for in logistics?",zh:"❓ 2. 物流中的PCR指的是什么指标？"},
+  a:{vi:"💡 Parcel Completion Rate – Tỷ lệ giao hàng thành công.",en:"💡 Parcel Completion Rate – the successful delivery rate.",zh:"💡 派送完成率（Parcel Completion Rate）。"}},
+ {q:{vi:"❓ 3. Yêu cầu bàn giao phương tiện giữa 2 ca làm việc gồm những gì?",en:"❓ 3. What does the vehicle handover between two shifts include?",zh:"❓ 3. 两个班次之间的车辆交接包括哪些内容？"},
+  a:{vi:"💡 Tình trạng xe, mức nhiên liệu, thùng xe sạch sẽ và đầy đủ giấy tờ vận chuyển.",en:"💡 Vehicle condition, fuel level, a clean cargo box, and complete transport documents.",zh:"💡 车辆状况、油量、干净的货厢以及齐全的运输证件。"}}
+]}
+]
+}
+);
+</script>
+<script>
+const QUESTION_BANK = [
+// ===== MODULE 1: LẮNG NGHE (10 câu) =====
+{m:1,correct:1,
+ vi:{q:"Khi tiếp nhận yêu cầu từ khách gửi hàng hoặc Điều hành, tài xế dùng kỹ thuật Paraphrasing nhằm mục đích gì?",a:["Im lặng và tự xử lý theo thói quen","Nhắc lại các chi tiết quan trọng (địa chỉ, mã hàng, ghi chú) để xác nhận chính xác 100%","Ngắt lời khách khi đang giải thích"]},
+ en:{q:"When receiving a request from a customer or Operations, why does the driver use Paraphrasing?",a:["Stay silent and act out of habit","Repeat key details (address, code, notes) to confirm 100% accuracy","Interrupt the customer while explaining"]},
+ zh:{q:"接收客户或调度部门的要求时，司机使用复述确认技巧的目的是什么？",a:["保持沉默按习惯处理","复述重要细节（地址、货号、备注）以确保100%准确","在客户解释时打断对方"]}},
+{m:1,correct:1,
+ vi:{q:"Khi khách hàng đang rất vội vã hoặc cáu gắt, tài xế SF nên lắng nghe như thế nào?",a:["Lập tức tranh cãi để bảo vệ bản thân","Bình tĩnh lắng nghe, ghi nhận nhanh thông tin cốt lõi và tập trung hoàn thành thủ tục bàn giao","Bỏ đi không hỗ trợ nữa"]},
+ en:{q:"When a customer is rushed or irritated, how should an SF driver listen?",a:["Argue immediately to defend themselves","Listen calmly, quickly note key info, and focus on completing the handover","Walk away and stop assisting"]},
+ zh:{q:"当客户非常匆忙或情绪暴躁时，顺丰司机应如何倾听？",a:["立即争辩以自我保护","冷静倾听，快速记录核心信息，专注完成交接手续","直接离开不再提供协助"]}},
+{m:1,correct:1,
+ vi:{q:"Hành động nào thể hiện tài xế LẮNG NGHE CHỦ ĐỘNG khi nhận bưu kiện?",a:["Nhìn ra chỗ khác khi khách đang nói","Tập trung 100%, gật đầu xác nhận và không ngắt lời khách","Vừa bấm điện thoại chơi game vừa nghe"]},
+ en:{q:"Which action shows ACTIVE LISTENING when receiving a parcel?",a:["Looking away while the customer speaks","Giving 100% attention, nodding to confirm, and not interrupting","Playing on the phone while listening"]},
+ zh:{q:"收件时哪种行为体现了「主动倾听」？",a:["客户说话时看向别处","100%专注、点头确认且不打断客户","一边玩手机一边听"]}},
+{m:1,correct:0,
+ vi:{q:"Khi bộ phận Điều hành giao lệnh đi lấy hàng gấp phát sinh, tài xế cần phản hồi thế nào?",a:["Ghi nhận, xác nhận lại lộ trình, thời gian Cut-off và yêu cầu đặc biệt của kiện hàng","Phớt lờ tin nhắn điều hành","Khi nào tiện thì đến không cần báo lại"]},
+ en:{q:"When Operations issues an urgent pickup order, how should the driver respond?",a:["Note it and confirm the route, cut-off time, and special requirements","Ignore the message from Operations","Show up whenever convenient without reporting back"]},
+ zh:{q:"调度部门下达紧急取件指令时，司机应如何回应？",a:["记录并确认路线、截单时间和特殊要求","忽略调度的消息","方便时再去，无需回复"]}},
+{m:1,correct:1,
+ vi:{q:"Lợi ích lớn nhất của việc không ngắt lời khách hàng khi nghe khiếu nại là gì?",a:["Tốn thời gian làm việc","Giúp khách hàng giải tỏa cảm xúc và thu thập chính xác nguyên nhân sự cố","Để khách tự nói một mình"]},
+ en:{q:"What is the biggest benefit of not interrupting a customer during a complaint?",a:["It wastes working time","It helps the customer vent and lets you gather the exact cause accurately","Letting the customer talk to themselves"]},
+ zh:{q:"倾听投诉时不打断客户的最大好处是什么？",a:["浪费工作时间","帮助客户宣泄情绪并准确了解问题原因","让客户自言自语"]}},
+{m:1,correct:0,
+ vi:{q:"Mô hình HURIER về kỹ năng lắng nghe hiệu quả do ai phát triển?",a:["Judi Brownell (Đại học Cornell)","Albert Mehrabian","John Boyd (Không quân Hoa Kỳ)"]},
+ en:{q:"Who developed the HURIER model of effective listening?",a:["Judi Brownell (Cornell University)","Albert Mehrabian","John Boyd (USAF)"]},
+ zh:{q:"有效倾听的HURIER模型是由谁提出的？",a:["Judi Brownell（康奈尔大学）","Albert Mehrabian","John Boyd（美国空军）"]}},
+{m:1,correct:2,
+ vi:{q:"Theo nghiên cứu của Ralph Nichols, người nghe thường chỉ nhớ được bao nhiêu % nội dung ngay sau khi nghe?",a:["Gần như 100%","70-90%","Khoảng 25-50%"]},
+ en:{q:"According to Ralph Nichols' research, how much of what they hear do listeners typically retain right after listening?",a:["Nearly 100%","70-90%","About 25-50%"]},
+ zh:{q:"根据Ralph Nichols的研究，听者听完后通常能记住多少内容？",a:["接近100%","70%-90%","约25%-50%"]}},
+{m:1,correct:1,
+ vi:{q:"Nguyên tắc 7-38-55 của Albert Mehrabian nhấn mạnh điều gì trong giao tiếp tình huống nhạy cảm?",a:["Nội dung lời nói quan trọng hơn tất cả","Thái độ, giọng điệu và ngôn ngữ cơ thể ảnh hưởng đến cảm nhận khách hàng nhiều hơn lời nói","Chỉ cần nói đúng ngữ pháp là đủ"]},
+ en:{q:"What does Mehrabian's 7-38-55 rule emphasize in sensitive communication?",a:["Spoken content matters more than anything else","Attitude, tone, and body language shape perception more than words themselves","Correct grammar alone is sufficient"]},
+ zh:{q:"Mehrabian的7-38-55法则在敏感沟通情境中强调了什么？",a:["说话内容比一切都重要","态度、语气和肢体语言比话语本身更能影响客户感受","只要语法正确就足够了"]}},
+{m:1,correct:0,
+ vi:{q:"\"Purple Promise\" là cam kết dịch vụ nổi tiếng của doanh nghiệp chuyển phát nào?",a:["FedEx","DHL","UPS"]},
+ en:{q:"\"Purple Promise\" is a well-known service commitment of which courier company?",a:["FedEx","DHL","UPS"]},
+ zh:{q:"「紫色承诺」是哪家快递企业著名的服务承诺？",a:["联邦快递 (FedEx)","DHL","UPS"]}},
+{m:1,correct:2,
+ vi:{q:"Việc các hãng như Giao Hàng Nhanh, Viettel Post, J&T Express gọi điện xác nhận trước khi giao hàng thể hiện điều gì?",a:["Thủ tục rườm rà không cần thiết","Chỉ để quảng cáo dịch vụ","Một hình thức lắng nghe chủ động giúp giảm tỷ lệ giao hàng thất bại"]},
+ en:{q:"What does it show when carriers like Giao Hang Nhanh, Viettel Post, and J&T Express call to confirm before delivery?",a:["An unnecessary, cumbersome procedure","Just advertising the service","A form of active listening that reduces delivery failure rate"]},
+ zh:{q:"Giao Hang Nhanh、Viettel Post、J&T Express等企业在派送前致电确认体现了什么？",a:["不必要的繁琐手续","只是为了宣传服务","一种主动倾听形式，有助于降低派送失败率"]}},
+// ===== MODULE 2: GIAO TIẾP & TÁC PHONG (10 câu) =====
+{m:2,correct:1,
+ vi:{q:"Thao tác nào sau đây là BẮT BUỘC khi vận chuyển và bưng bê kiện hàng của khách?",a:["Kéo lê thùng hàng trên sàn cho nhẹ sức","Bưng bê bằng hai tay, đặt nhẹ nhàng, chủ động hỗ trợ bưng hàng giúp khách","Ném nhẹ kiện hàng vào góc kho cho nhanh"]},
+ en:{q:"Which action is MANDATORY when carrying a customer's parcel?",a:["Drag the box on the floor to save effort","Carry with both hands, place gently, and proactively help the customer","Toss the parcel into a corner to save time"]},
+ zh:{q:"搬运客户包裹时，以下哪项操作是必须的？",a:["在地上拖拽货箱以省力","双手搬运、轻放，并主动帮助客户","为图快而将包裹扔进角落"]}},
+{m:2,correct:1,
+ vi:{q:"Khi khách hàng gửi kiện hàng nặng hoặc cồng kềnh, thái độ chuẩn mực của tài xế SF là gì?",a:["Tỏ thái độ khó chịu và yêu cầu khách tự khiêng","Vui vẻ, lịch sự và chủ động hỗ trợ bưng bê xếp dỡ giúp khách","Từ chối phục vụ nếu không có tiền bồi dưỡng"]},
+ en:{q:"When a customer sends a heavy or bulky parcel, what is the correct attitude for an SF driver?",a:["Show annoyance and ask the customer to carry it themselves","Be cheerful, polite, and proactively help carry/unload it","Refuse service unless given a tip"]},
+ zh:{q:"客户寄送笨重或大件货物时，顺丰司机应有的标准态度是什么？",a:["表现出不耐烦并要求客户自己搬","愉快、礼貌并主动协助搬运卸货","没有小费就拒绝服务"]}},
+{m:2,correct:0,
+ vi:{q:"Khi gặp khách hàng trực tiếp, quy chuẩn diện mạo chuyên nghiệp của nhân viên SF là gì?",a:["Đồng phục gọn gàng, đeo thẻ nhân viên, xe và thùng hàng sạch sẽ","Mặc quần đùi áo may ba cho thoải mái","Không cần đeo thẻ nhân viên"]},
+ en:{q:"When meeting customers directly, what is the professional appearance standard for SF staff?",a:["Tidy uniform, employee badge worn, clean vehicle and cargo box","Wear shorts and a tank top for comfort","No need to wear the employee badge"]},
+ zh:{q:"直接接触客户时，顺丰员工的专业仪容标准是什么？",a:["整洁制服、佩戴工牌、车辆和货厢干净","为了舒适穿短裤背心","无需佩戴工牌"]}},
+{m:2,correct:1,
+ vi:{q:"Chủ đề nào tài xế KHÔNG NÊN bàn luận với khách hàng trong quá trình giao nhận hàng?",a:["Hướng dẫn đóng gói bưu kiện","Chính trị, tôn giáo, chuyện đời tư cá nhân","Xác nhận thời gian nhận hàng"]},
+ en:{q:"Which topic should a driver NOT discuss with customers during handover?",a:["Packaging guidance","Politics, religion, personal life","Confirming the receiving time"]},
+ zh:{q:"在收发货过程中，司机不应与客户讨论哪类话题？",a:["包装指导","政治、宗教、个人隐私","确认收货时间"]}},
+{m:2,correct:1,
+ vi:{q:"Khi bàn giao hàng hóa cho khách, tài xế nên có lời chào và cử chỉ như thế nào?",a:["Mặt lạnh lùng không nói câu nào","Chào hỏi lịch sự, đưa chứng từ/thiết bị bằng hai tay và nở nụ cười nhẹ","Quăng giấy tờ lên bàn rồi đi"]},
+ en:{q:"When handing over the parcel, how should the driver greet and behave?",a:["A cold expression with no words","Greet politely, hand documents/device with both hands, and smile lightly","Throw the papers on the table and leave"]},
+ zh:{q:"交货给客户时，司机应有怎样的问候和举止？",a:["面无表情一言不发","礼貌问候，双手递交单据/设备并微笑","把单据扔在桌上就离开"]}},
+{m:2,correct:1,
+ vi:{q:"Mô hình SERVQUAL do ai đề xuất, dùng để đánh giá chất lượng dịch vụ?",a:["Bruce Tuckman","Parasuraman, Zeithaml & Berry","John Boyd"]},
+ en:{q:"Who proposed the SERVQUAL model used to assess service quality?",a:["Bruce Tuckman","Parasuraman, Zeithaml & Berry","John Boyd"]},
+ zh:{q:"用于评估服务质量的SERVQUAL模型是由谁提出的？",a:["Bruce Tuckman","Parasuraman, Zeithaml & Berry","John Boyd"]}},
+{m:2,correct:2,
+ vi:{q:"Yếu tố nào sau đây KHÔNG thuộc 5 thành phần của mô hình SERVQUAL?",a:["Sự đồng cảm (Empathy)","Yếu tố hữu hình (Tangibles)","Lợi nhuận (Profitability)"]},
+ en:{q:"Which of the following is NOT one of the 5 SERVQUAL dimensions?",a:["Empathy","Tangibles","Profitability"]},
+ zh:{q:"以下哪项不属于SERVQUAL模型的五个维度？",a:["同理心 (Empathy)","有形性 (Tangibles)","盈利能力 (Profitability)"]}},
+{m:2,correct:0,
+ vi:{q:"Trong ngành chuyển phát, yếu tố \"Tangibles\" (hữu hình) của SERVQUAL thể hiện rõ nhất qua điều gì?",a:["Tác phong, đồng phục, tình trạng xe và bưu kiện của tài xế","Giá cước vận chuyển","Số lượng chi nhánh của công ty"]},
+ en:{q:"In courier services, the \"Tangibles\" dimension of SERVQUAL is best reflected by what?",a:["The driver's conduct, uniform, and condition of vehicle/parcel","The shipping fee","The number of company branches"]},
+ zh:{q:"在快递行业中，SERVQUAL的「有形性」维度最明显体现在什么方面？",a:["司机的仪态、制服及车辆/货物状况","运费价格","公司分支机构数量"]}},
+{m:2,correct:1,
+ vi:{q:"Chương trình đào tạo \"340 Methods\" chuẩn hóa thao tác tài xế là của doanh nghiệp nào?",a:["DHL","UPS","Grab Express"]},
+ en:{q:"The \"340 Methods\" training program that standardizes driver procedures belongs to which company?",a:["DHL","UPS","Grab Express"]},
+ zh:{q:"标准化司机操作流程的「340种方法」培训计划属于哪家企业？",a:["DHL","UPS","Grab Express"]}},
+{m:2,correct:0,
+ vi:{q:"Khái niệm \"last-mile touchpoint\" (điểm chạm cuối cùng) trong logistics có nghĩa là gì?",a:["Thời điểm duy nhất khách hàng gặp trực tiếp đại diện thương hiệu (tài xế) trong toàn chuỗi cung ứng","Điểm giao hàng xa nhất trong thành phố","Chặng vận chuyển đường dài giữa các kho"]},
+ en:{q:"What does the \"last-mile touchpoint\" concept mean in logistics?",a:["The one moment a customer meets the brand's human representative (the driver) in the whole supply chain","The farthest delivery point in a city","The long-haul leg between warehouses"]},
+ zh:{q:"物流中「最后一公里触点」的概念是什么意思？",a:["客户在整个供应链中唯一直接接触品牌代表（司机）的时刻","城市中最远的派送点","仓库之间的长途运输段"]}},
+// ===== MODULE 3: LÁI XE AN TOÀN (10 câu) =====
+{m:3,correct:1,
+ vi:{q:"Nguyên tắc xếp hàng hóa nào đúng quy chuẩn an toàn trên xe tải?",a:["Xếp hàng nặng lên trên hàng nhẹ để đè giữ hàng","Hàng nặng xếp dưới, hàng nhẹ/dễ vỡ xếp trên và chằng buộc chắc chắn","Chất đống tự do miễn sao vừa thùng xe"]},
+ en:{q:"Which cargo-loading principle follows safety standards for trucks?",a:["Put heavy items on top of light items to hold them down","Heavy items at the bottom, light/fragile items on top, all secured tightly","Pile freely as long as it fits the cargo box"]},
+ zh:{q:"以下哪种货物装载方式符合货车安全规范？",a:["把重物压在轻物上方以固定货物","重物放下方、轻/易碎物放上方并牢固捆绑","只要能塞进货厢，随意堆放即可"]}},
+{m:3,correct:1,
+ vi:{q:"Việc giữ khoảng cách an toàn và quan sát tầm xa (15-20 giây) giúp ích gì cho chất lượng hàng hóa?",a:["Giúp xe chạy nhanh hơn","Giúp tài xế chủ động giảm tốc nhẹ nhàng, tránh phanh gấp làm va đập đổ vỡ hàng","Không liên quan đến hàng hóa"]},
+ en:{q:"How does keeping a safe distance and scanning 15-20 seconds ahead help cargo quality?",a:["It makes the vehicle go faster","It lets the driver slow down gently, avoiding sudden braking that damages cargo","It has nothing to do with cargo"]},
+ zh:{q:"保持安全车距并提前15-20秒观察路况对货物质量有什么帮助？",a:["能让车辆行驶更快","让司机能平稳减速，避免急刹造成货物碰撞损坏","与货物无关"]}},
+{m:3,correct:1,
+ vi:{q:"Trời mưa to, đường trơn trượt, khoảng cách an toàn (quy tắc giây) nên tăng lên như thế nào?",a:["Giữ nguyên 3 giây","Tăng lên tối thiểu 6 giây để phòng tránh va chạm và giật phanh gấp","Giảm xuống 1 giây"]},
+ en:{q:"In heavy rain and slippery roads, how should the safe-distance rule change?",a:["Keep it at 3 seconds","Increase to at least 6 seconds to prevent collisions and sudden braking","Reduce it to 1 second"]},
+ zh:{q:"大雨天路面湿滑时，安全距离（秒数法则）应如何调整？",a:["保持3秒不变","增加到至少6秒以防碰撞和急刹","减少到1秒"]}},
+{m:3,correct:0,
+ vi:{q:"Trước khi bắt đầu chuyến xe vận chuyển, tài xế BẮT BUỘC phải kiểm tra điều gì ở thùng xe?",a:["Thùng xe sạch, khô ráo, không rò rỉ nước và đã khóa/niêm phong an toàn","Chỉ cần xe chạy được là được","Không cần kiểm tra thùng xe"]},
+ en:{q:"Before starting a trip, what must the driver check on the cargo box?",a:["The box is clean, dry, leak-free, and safely locked/sealed","Only that the vehicle can run","No need to check the cargo box"]},
+ zh:{q:"出车前，司机必须检查货厢的哪些方面？",a:["货厢干净、干燥、不漏水，并已安全上锁/封条","只要车能开就行","无需检查货厢"]}},
+{m:3,correct:0,
+ vi:{q:"Thao tác nào bị CẤM TUYỆT ĐỐI khi đang điều khiển phương tiện vận chuyển bưu kiện?",a:["Sử dụng điện thoại di động bằng tay để nghe gọi, nhắn tin","Quan sát gương chiếu hậu","Giữ đúng tốc độ quy định"]},
+ en:{q:"Which action is strictly PROHIBITED while driving?",a:["Using a handheld phone to call or text","Checking the rearview mirror","Maintaining the correct speed"]},
+ zh:{q:"驾驶运输车辆时，绝对禁止哪种操作？",a:["用手持手机打电话或发短信","查看后视镜","保持规定车速"]}},
+{m:3,correct:0,
+ vi:{q:"Quy tắc khoảng cách an toàn 3 giây (6 giây khi trời xấu) được khuyến nghị bởi tổ chức nào?",a:["NHTSA (Cơ quan An toàn Giao thông Đường bộ Quốc gia Hoa Kỳ)","Tổ chức Y tế Thế giới (WHO)","Liên đoàn Bóng đá Thế giới (FIFA)"]},
+ en:{q:"Which organization recommends the 3-second (6-second in bad weather) following distance rule?",a:["NHTSA (U.S. National Highway Traffic Safety Administration)","World Health Organization (WHO)","FIFA"]},
+ zh:{q:"3秒（恶劣天气6秒）安全车距法则是哪个机构建议的？",a:["NHTSA（美国国家公路交通安全管理局）","世界卫生组织（WHO）","国际足联（FIFA）"]}},
+{m:3,correct:2,
+ vi:{q:"Nguyên tắc nào sau đây KHÔNG thuộc 5 nguyên tắc của Smith System trong lái xe phòng vệ?",a:["Get the Big Picture (Quan sát toàn cảnh)","Leave Yourself an Out (Chừa đường thoát hiểm)","Maximize Speed (Tối đa tốc độ)"]},
+ en:{q:"Which of the following is NOT one of the 5 Smith System defensive-driving principles?",a:["Get the Big Picture","Leave Yourself an Out","Maximize Speed"]},
+ zh:{q:"以下哪项不属于史密斯系统防御性驾驶的五大原则？",a:["纵观全局 (Get the Big Picture)","留有退路 (Leave Yourself an Out)","将速度最大化 (Maximize Speed)"]}},
+{m:3,correct:1,
+ vi:{q:"Việc xếp hàng nặng ở dưới đáy thùng xe dựa trên nguyên lý vật lý nào?",a:["Lực ma sát cực đại","Trọng tâm thấp (low center of gravity) giúp xe ổn định khi cua/phanh","Định luật bảo toàn năng lượng"]},
+ en:{q:"Placing heavy items at the bottom of the cargo box is based on which physics principle?",a:["Maximum friction force","Low center of gravity, which stabilizes the vehicle during turns/braking","Conservation of energy"]},
+ zh:{q:"将重物放置在货厢底部依据的是什么物理原理？",a:["最大摩擦力","低重心原理，使车辆转弯/刹车时更稳定","能量守恒定律"]}},
+{m:3,correct:0,
+ vi:{q:"Đội xe của doanh nghiệp nào được ghi nhận có tỷ lệ tai nạn/triệu dặm thấp nhờ huấn luyện an toàn nội bộ nghiêm ngặt (\"seatbelt-key-mirror\")?",a:["UPS","Ninja Van","Amazon Logistics"]},
+ en:{q:"Which company's fleet is recognized for a low accident rate per million miles thanks to strict internal safety training (\"seatbelt-key-mirror\")?",a:["UPS","Ninja Van","Amazon Logistics"]},
+ zh:{q:"哪家企业的车队因严格的内部安全培训（「安全带-钥匙-后视镜」）而以百万英里事故率低而闻名？",a:["UPS","Ninja Van","亚马逊物流"]}},
+{m:3,correct:2,
+ vi:{q:"Tại Việt Nam, Viettel Post và J&T Express trang bị camera hành trình (dashcam) và GPS giám sát tốc độ nhằm mục đích chính là gì?",a:["Để quay video giải trí cho tài xế","Chỉ để theo dõi vị trí giao hàng","Nhắc nhở tài xế duy trì khoảng cách và tốc độ an toàn theo thời gian thực"]},
+ en:{q:"In Vietnam, why do Viettel Post and J&T Express equip trucks with dashcams and GPS speed monitoring?",a:["To record entertainment videos for drivers","Only to track delivery location","To remind drivers to keep safe distance and speed in real time"]},
+ zh:{q:"在越南，Viettel Post和J&T Express为货车配备行车记录仪和GPS测速系统的主要目的是什么？",a:["为司机录制娱乐视频","仅用于追踪派送位置","实时提醒司机保持安全车距与车速"]}}
+];
+</script>
+<script>
+QUESTION_BANK.push(
+// ===== MODULE 4: XỬ LÝ TÌNH HUỐNG (10 câu) =====
+{m:4,correct:1,
+ vi:{q:"Phát hiện vỏ bưu kiện bị móp méo/rách khi chuẩn bị giao cho khách, tài xế nên xử lý ra sao?",a:["Giấu vết móp và giao thật nhanh rồi đi","Bình tĩnh giải thích, cùng khách kiểm tra thực tế, chụp ảnh và báo CS/Điều hành hỗ trợ","Đổ lỗi cho nhân viên chia chọn kho"]},
+ en:{q:"If you find the parcel dented/torn right before delivery, what should you do?",a:["Hide the damage and deliver quickly, then leave","Calmly explain, inspect it together with the customer, take photos, and notify CS/Operations","Blame the warehouse sorting staff"]},
+ zh:{q:"派送前发现包裹外皮凹陷/破损，司机应如何处理？",a:["隐藏破损痕迹并快速交货离开","冷静解释，与客户一起检查实际情况，拍照并上报客服/调度","归咎于仓库分拣人员"]}},
+{m:4,correct:1,
+ vi:{q:"Khi gặp kẹt xe nghiêm trọng có nguy cơ trễ giờ giao hàng đã hẹn, tài xế cần làm gì?",a:["Im lặng, khi nào đến nơi mới giải thích","Chủ động gọi điện xin lỗi khách hàng, báo thời gian dự kiến trễ và cập nhật điều hành","Tự ý hủy đơn hàng trên hệ thống"]},
+ en:{q:"During heavy traffic that risks missing the scheduled delivery, what should the driver do?",a:["Stay silent and explain only upon arrival","Proactively call to apologize, give the expected delay time, and update Operations","Cancel the order in the system on their own"]},
+ zh:{q:"遇到严重拥堵可能延误约定送货时间时，司机应该怎么做？",a:["保持沉默，到达后再解释","主动致电道歉，告知预计延误时间并更新调度","擅自在系统中取消订单"]}},
+{m:4,correct:1,
+ vi:{q:"Phương tiện gặp sự cố hỏng hóc giữa đường, ưu tiên số 1 của tài xế là gì?",a:["Bỏ xe đi về","Đảm bảo an toàn giao thông và bảo vệ an toàn cho toàn bộ hàng hóa trên xe","Mở thùng xe ra cho thoáng"]},
+ en:{q:"If the vehicle breaks down mid-route, what is the driver's number-1 priority?",a:["Abandon the vehicle and go home","Ensure traffic safety and protect the safety of all cargo on board","Open the cargo box for ventilation"]},
+ zh:{q:"车辆在途中发生故障，司机的第一优先事项是什么？",a:["弃车回家","确保交通安全并保护车上所有货物的安全","打开货厢通风"]}},
+{m:4,correct:1,
+ vi:{q:"Khách hàng từ chối nhận hàng do đơn hàng bị trễ so với cam kết, tài xế nên phản ứng thế nào?",a:["Quát mắng khách hàng","Lắng nghe, xin lỗi chân thành về sự chậm trễ và lập biên bản/báo về CS xử lý","Vứt hàng lại trước cửa nhà khách"]},
+ en:{q:"If a customer refuses to accept a late delivery, how should the driver react?",a:["Yell at the customer","Listen, sincerely apologize for the delay, and file a report/notify CS to handle it","Leave the parcel at the door and go"]},
+ zh:{q:"因订单延误客户拒收时，司机应如何应对？",a:["斥责客户","倾听并真诚就延误道歉，填写记录/上报客服处理","把货物丢在客户门口离开"]}},
+{m:4,correct:0,
+ vi:{q:"Với hàng xuất khẩu, khi khách hàng không đồng ý cho nhân viên mở kiểm tra hàng đối chiếu Invoice, nhân viên nên giải thích lý do chính là gì?",a:["Để hỗ trợ hàng hoá được thông quan và xuất khẩu nhanh nhất, kịp thời điều chỉnh nếu thông tin khai báo trên Invoice có sai lệch","Vì quy định bắt buộc phải mở tất cả các kiện hàng không có ngoại lệ","Để kiểm tra xem khách có gian lận hay không"]},
+ en:{q:"For export cargo, when a customer refuses to let staff open the parcel to check it against the Invoice, what is the main reason staff should explain?",a:["To help the shipment clear customs and be exported as fast as possible, and promptly fix any mismatch in the Invoice declaration","Because regulations require opening every parcel with no exceptions","To check whether the customer is committing fraud"]},
+ zh:{q:"对于出口货物，客户不同意员工开箱核对发票时，员工应说明的主要理由是什么？",a:["为协助货物尽快通关出口，并在发票申报信息有误时及时调整","因为规定要求必须无例外地打开所有包裹","为了检查客户是否存在欺诈行为"]}},
+{m:4,correct:2,
+ vi:{q:"Theo quy định xuất khẩu, hàng nào sau đây thuộc danh mục CẤM vận chuyển?",a:["Hàng dễ vỡ đã được chèn lót cẩn thận","Hàng đóng pallet gỗ có kèm chứng thư hun trùng","Pin Lithium-ion/kim loại rời, ngà voi, sừng và các sản phẩm từ động vật hoang dã"]},
+ en:{q:"Under export regulations, which of the following is classified as PROHIBITED for shipment?",a:["Fragile goods that have been carefully cushioned","Wooden pallet cargo with a fumigation certificate attached","Loose lithium-ion/lithium-metal batteries, ivory, horns, and wildlife products"]},
+ zh:{q:"根据出口规定，以下哪项属于禁止运输的物品？",a:["已妥善缓冲包装的易碎品","附有熏蒸证书的木质栈板货物","散装锂离子/锂金属电池、象牙、犀牛角及野生动物制品"]}},
+{m:4,correct:1,
+ vi:{q:"Lô hàng xuất khẩu có giá trị khai báo trên 5.000.000 VNĐ hoặc khối lượng trên 50kg thì cần thực hiện thủ tục gì?",a:["Không cần thủ tục gì thêm","Bắt buộc lên tờ khai hải quan xuất khẩu theo quy định","Chỉ cần dán thêm nhãn cảnh báo"]},
+ en:{q:"What procedure is required for an export shipment declared over 5,000,000 VND or weighing over 50kg?",a:["No additional procedure is needed","An export customs declaration must be filed as required","Only a warning label needs to be attached"]},
+ zh:{q:"申报价值超过500万越南盾或货重超过50公斤的出口货物需要办理什么手续？",a:["不需要额外手续","必须按规定办理出口报关单","只需贴上警示标签即可"]}},
+{m:4,correct:0,
+ vi:{q:"Hàng đóng kiện/pallet gỗ khi xuất khẩu bắt buộc phải kèm theo giấy tờ nào?",a:["Chứng thư hun trùng (Fumigation Certificate) bản gốc","Giấy bảo hành sản phẩm","Hóa đơn mua hàng của khách"]},
+ en:{q:"When exporting wooden crate/pallet cargo, which document must accompany it?",a:["An original Fumigation Certificate","A product warranty certificate","The customer's purchase receipt"]},
+ zh:{q:"出口木质栈板/木箱货物时必须附带哪份文件？",a:["熏蒸证书（Fumigation Certificate）原件","产品保修单","客户的购物收据"]}},
+{m:4,correct:2,
+ vi:{q:"Theo quy định hiện hành của hãng bay, hàng đóng pallet tạm thời KHÔNG được xuất qua sân bay nào?",a:["Chỉ áp dụng cho sân bay nội địa Việt Nam","HAN và SGN","SZX (Thâm Quyến) và PVG (Phố Đông – Thượng Hải)"]},
+ en:{q:"Under current airline regulations, palletized cargo is currently NOT accepted for export via which airports?",a:["Only applies to domestic Vietnamese airports","HAN and SGN","SZX (Shenzhen) and PVG (Shanghai Pudong)"]},
+ zh:{q:"根据航空公司现行规定，栈板货物目前不能经由哪些机场出口？",a:["仅适用于越南国内机场","河内（HAN）和胡志明市（SGN）","深圳（SZX）和上海浦东（PVG）"]}},
+{m:4,correct:0,
+ vi:{q:"Trong mô hình xử lý khiếu nại LAST, bước đầu tiên (L) là gì?",a:["Listen – Lắng nghe trọn vẹn vấn đề của khách","Leave – Rời khỏi hiện trường","Loan – Cho khách vay tiền"]},
+ en:{q:"In the LAST complaint-handling model, what is the first step (L)?",a:["Listen – fully hear the customer's issue","Leave – leave the scene","Loan – lend the customer money"]},
+ zh:{q:"在LAST投诉处理模型中，第一步（L）是什么？",a:["Listen – 充分倾听客户的问题","Leave – 离开现场","Loan – 借钱给客户"]}},
+// ===== MODULE 5: QUẢN LÝ THỜI GIAN (10 câu) =====
+{m:5,correct:0,
+ vi:{q:"Theo quy chuẩn an toàn lái xe, tài xế không được lái xe liên tục quá bao nhiêu giờ?",a:["Không quá 4 giờ liên tục","Không quá 6 giờ liên tục","Không quá 8 giờ liên tục"]},
+ en:{q:"Per safety regulations, drivers should not drive continuously for more than how many hours?",a:["No more than 4 hours straight","No more than 6 hours straight","No more than 8 hours straight"]},
+ zh:{q:"根据安全驾驶规范，司机连续驾驶不得超过多少小时？",a:["不超过连续4小时","不超过连续6小时","不超过连续8小时"]}},
+{m:5,correct:0,
+ vi:{q:"Việc sắp xếp thứ tự các điểm giao/nhận hàng theo tuyến đường tối ưu trước khi xuất kho mang lại lợi ích gì?",a:["Tiết kiệm nhiên liệu, giảm thời gian di chuyển và nâng cao tỷ lệ giao đúng giờ (PCR)","Không có tác dụng gì","Chỉ làm mất thời gian lập kế hoạch"]},
+ en:{q:"What benefit comes from sequencing delivery/pickup points on an optimal route before departure?",a:["Saves fuel, reduces travel time, and improves on-time delivery rate (PCR)","No benefit at all","Only wastes planning time"]},
+ zh:{q:"出库前按最优路线安排取送货点顺序有什么好处？",a:["节省燃油、减少行车时间并提高准时派送率（PCR）","没有任何作用","只会浪费规划时间"]}},
+{m:5,correct:1,
+ vi:{q:"Thời điểm nào là thích hợp nhất để tài xế thực hiện nạp nhiên liệu hoặc vệ sinh xe?",a:["Trong giờ cao điểm giao nhận hàng","Vào thời gian nghỉ giữa ca hoặc ngoài giờ cao điểm","Khi khách đang đứng chờ nhận hàng"]},
+ en:{q:"When is the best time for a driver to refuel or clean the vehicle?",a:["During peak pickup/delivery hours","During shift breaks or off-peak hours","While a customer is waiting to receive a parcel"]},
+ zh:{q:"司机加油或清洁车辆的最佳时机是什么时候？",a:["在收发货高峰时段","在班次休息或非高峰时段","客户正在等待收货时"]}},
+{m:5,correct:0,
+ vi:{q:"Ngay sau khi giao xong 1 kiện hàng cho khách, tài xế cần thực hiện thao tác gì trên App?",a:["Cập nhật ngay trạng thái 'Đã giao thành công' để hệ thống ghi nhận Realtime","Để đến cuối tuần mới cập nhật một lượt","Không cần cập nhật"]},
+ en:{q:"Right after delivering a parcel, what should the driver do on the app?",a:["Immediately update 'Delivered successfully' for real-time tracking","Wait until the weekend to update in bulk","No need to update"]},
+ zh:{q:"完成一单派送后，司机应在App上进行什么操作？",a:["立即更新「已成功送达」状态以便系统实时记录","等到周末一次性更新","无需更新"]}},
+{m:5,correct:1,
+ vi:{q:"Khái niệm 'Khung giờ Cut-off' trong Logistics SF Express có nghĩa là gì?",a:["Giờ nghỉ trưa của tài xế","Thời hạn cuối cùng để thu gom/xuất chuyến hàng nhằm kịp tiến độ vận chuyển","Giờ mở cửa của kho hàng"]},
+ en:{q:"What does the 'Cut-off time' concept mean in SF Express logistics?",a:["The driver's lunch break","The final deadline for collecting/dispatching shipments to stay on schedule","The warehouse opening hour"]},
+ zh:{q:"顺丰速运物流中的「截单时间」概念是什么意思？",a:["司机的午休时间","为赶上运输进度而收件/发车的最后期限","仓库开门时间"]}},
+{m:5,correct:1,
+ vi:{q:"Ma trận Eisenhower giúp tài xế sắp xếp công việc dựa trên 2 trục nào?",a:["Nặng – Nhẹ","Khẩn cấp – Quan trọng","Xa – Gần"]},
+ en:{q:"The Eisenhower Matrix helps prioritize tasks based on which two axes?",a:["Heavy – Light","Urgent – Important","Far – Near"]},
+ zh:{q:"艾森豪威尔矩阵基于哪两个维度帮助安排任务优先级？",a:["重—轻","紧急—重要","远—近"]}},
+{m:5,correct:2,
+ vi:{q:"VRP (Vehicle Routing Problem) là bài toán toán học liên quan đến vấn đề gì?",a:["Tính lương cho tài xế","Định giá cước vận chuyển","Tối ưu lộ trình đi qua nhiều điểm giao/nhận với quãng đường ngắn nhất"]},
+ en:{q:"The Vehicle Routing Problem (VRP) in mathematics deals with what issue?",a:["Calculating driver salaries","Pricing shipping fees","Optimizing routes through multiple stops with the shortest total distance"]},
+ zh:{q:"数学中的车辆路径问题（VRP）涉及什么内容？",a:["计算司机工资","制定运费价格","以最短总里程优化经过多个收发点的路线"]}},
+{m:5,correct:0,
+ vi:{q:"Quy định giới hạn thời gian lái xe liên tục (không quá 4 giờ) chủ yếu nhằm mục đích gì?",a:["Giảm nguy cơ tai nạn do mất tập trung/buồn ngủ","Giúp tài xế có nhiều thời gian nghỉ hơn giờ làm","Tăng số km chạy trong ngày"]},
+ en:{q:"What is the main purpose of limiting continuous driving to no more than 4 hours?",a:["Reduce accident risk from fatigue/loss of focus","Give drivers more rest than work time","Increase daily mileage"]},
+ zh:{q:"限制连续驾驶不超过4小时的主要目的是什么？",a:["降低因疲劳/注意力不集中导致的事故风险","让司机的休息时间多于工作时间","增加每日行驶里程"]}},
+{m:5,correct:1,
+ vi:{q:"DHL và FedEx sử dụng phần mềm định tuyến tự động dựa trên thuật toán nào để tính lộ trình tối ưu?",a:["Thuật toán mã hóa dữ liệu (Encryption)","Thuật toán dựa trên bài toán VRP","Thuật toán nén hình ảnh"]},
+ en:{q:"DHL and FedEx use automated routing software based on which type of algorithm?",a:["Data encryption algorithms","Algorithms based on the VRP problem","Image compression algorithms"]},
+ zh:{q:"DHL和联邦快递使用基于哪种算法的自动路线规划软件？",a:["数据加密算法","基于VRP问题的算法","图像压缩算法"]}},
+{m:5,correct:2,
+ vi:{q:"Tại Việt Nam, GHTK và J&T Express kết hợp hệ thống auto-routing với yếu tố nào để tối đa số đơn giao trong ca?",a:["Giá xăng dầu hàng ngày","Số lượng nhân viên văn phòng","Khung giờ Cut-off theo từng bưu cục"]},
+ en:{q:"In Vietnam, GHTK and J&T Express combine auto-routing with which factor to maximize deliveries per shift?",a:["Daily fuel prices","Number of office staff","Per-hub cut-off times"]},
+ zh:{q:"在越南，GHTK和J&T Express将自动路线系统与什么因素结合，以最大化每班次派送量？",a:["每日油价","办公室员工数量","各网点的截单时间"]}},
+// ===== MODULE 6: LÀM VIỆC NHÓM (10 câu) =====
+{m:6,correct:1,
+ vi:{q:"Trách nhiệm phối hợp của tài xế với Bộ phận Điều hành giao vận là gì?",a:["Chỉ báo cáo vào cuối ngày","Cập nhật trạng thái chuyến đi kịp thời (Đã lấy hàng, Đang di chuyển, Đã giao thành công)","Tự thay đổi tuyến đường mà không cần thông báo"]},
+ en:{q:"What is the driver's coordination responsibility with the Operations department?",a:["Only report at the end of the day","Update trip status promptly (Picked up, In transit, Delivered)","Change the route on their own without notifying anyone"]},
+ zh:{q:"司机与调度部门协作的职责是什么？",a:["只在一天结束时报告","及时更新行程状态（已取件、运输中、已送达）","自行改变路线而不通知任何人"]}},
+{m:6,correct:1,
+ vi:{q:"Khi hoàn tất ca làm việc, tài xế có trách nhiệm bàn giao phương tiện như thế nào?",a:["Đỗ xe tại bãi, để lại chìa khóa mà không cần dọn cabin","Vệ sinh cabin/thùng xe, kiểm tra nhiên liệu, bàn giao đầy đủ giấy tờ và báo cáo sự cố nếu có","Giao xe trực tiếp cho người ca sau mà không cần đối soát tình trạng"]},
+ en:{q:"At the end of a shift, how should the driver hand over the vehicle?",a:["Park it and leave the keys without cleaning the cabin","Clean the cabin/cargo box, check fuel, hand over full documents, and report any issues","Hand it directly to the next shift without checking its condition"]},
+ zh:{q:"班次结束时，司机应如何交接车辆？",a:["停车留下钥匙，无需清理驾驶室","清洁驾驶室/货厢，检查油量，交接齐全证件，并报告任何问题","直接交给下一班次而不核对车况"]}},
+{m:6,correct:1,
+ vi:{q:"Trách nhiệm cốt lõi của tài xế khi làm việc với Nhân viên Kho (Warehouse/Sorter) là gì?",a:["Tranh giành bưu kiện","Kiểm đếm chính xác số lượng, tình trạng bao bì/tem nhãn và ký bàn giao rõ ràng","Giao toàn bộ việc chất xếp cho kho"]},
+ en:{q:"What is the driver's core responsibility when working with Warehouse/Sorter staff?",a:["Compete over parcels","Accurately count quantities, check packaging/label condition, and sign off handovers clearly","Leave all loading work entirely to the warehouse"]},
+ zh:{q:"司机与仓库/分拣人员协作时的核心职责是什么？",a:["争抢包裹","准确清点数量、检查包装/标签状况并清楚签收交接","把所有装载工作完全交给仓库"]}},
+{m:6,correct:1,
+ vi:{q:"Khi phát hiện tuyến đường phía trước bị ngập sâu hoặc kẹt xe đứt đoạn, tài xế nên làm gì cho đội ngũ?",a:["Giữ bí mật một mình","Chủ động chia sẻ thông tin giao thông lên nhóm đội xe để đồng nghiệp tránh đường","Xúi các tài xế khác đi vào"]},
+ en:{q:"Upon discovering deep flooding or gridlock ahead, what should the driver do for the team?",a:["Keep it a secret","Proactively share the traffic info in the fleet group so colleagues can avoid it","Encourage other drivers to go that way"]},
+ zh:{q:"发现前方道路严重积水或堵塞时，司机应为团队做什么？",a:["自己保密不说","主动在车队群里分享交通信息，让同事避开","怂恿其他司机继续前往"]}},
+{m:6,correct:1,
+ vi:{q:"Tinh thần làm việc nhóm (Teamwork) trong đội xe SF Express thể hiện rõ nhất qua hành vi nào?",a:["Chỉ làm xong việc của mình rồi về","Sẵn sàng hỗ trợ đồng nghiệp cứu hộ, san hàng khi xe gặp sự cố trên đường","So kè số lượng đơn hàng với đồng nghiệp"]},
+ en:{q:"Which behavior best reflects teamwork spirit in the SF Express fleet?",a:["Only finishing your own work and leaving","Being ready to help rescue cargo when a colleague's vehicle breaks down","Competing with colleagues over order counts"]},
+ zh:{q:"顺丰车队中，哪种行为最能体现团队合作精神？",a:["只完成自己的工作就下班","当同事车辆出问题时主动协助抢救货物","与同事比拼订单数量"]}},
+{m:6,correct:0,
+ vi:{q:"Mô hình phát triển nhóm 5 giai đoạn (Forming-Storming-Norming-Performing-Adjourning) do ai đề xuất?",a:["Bruce Tuckman (1965)","Albert Mehrabian","Parasuraman, Zeithaml & Berry"]},
+ en:{q:"Who proposed the 5-stage team development model (Forming-Storming-Norming-Performing-Adjourning)?",a:["Bruce Tuckman (1965)","Albert Mehrabian","Parasuraman, Zeithaml & Berry"]},
+ zh:{q:"「形成-震荡-规范-高效-解散」五阶段团队发展模型是谁提出的？",a:["Bruce Tuckman（1965年）","Albert Mehrabian","Parasuraman, Zeithaml & Berry"]}},
+{m:6,correct:2,
+ vi:{q:"Giai đoạn nào trong mô hình Tuckman thể hiện đội nhóm đã vận hành hiệu quả, phối hợp trơn tru?",a:["Forming (Hình thành)","Storming (Xung đột)","Performing (Vận hành hiệu quả)"]},
+ en:{q:"Which Tuckman stage reflects a team operating effectively with smooth coordination?",a:["Forming","Storming","Performing"]},
+ zh:{q:"塔克曼模型中，哪个阶段表示团队已经高效运作、配合顺畅？",a:["形成期 (Forming)","震荡期 (Storming)","高效期 (Performing)"]}},
+{m:6,correct:1,
+ vi:{q:"PCR (Parcel Completion Rate) là chỉ số phản ánh điều gì?",a:["Mức lương thưởng của tài xế","Tỷ lệ giao hàng thành công, phản ánh hiệu quả phối hợp tài xế – kho – điều hành","Số lượng xe trong đội"]},
+ en:{q:"What does the PCR (Parcel Completion Rate) indicator reflect?",a:["The driver's salary/bonus level","The successful delivery rate, reflecting coordination between driver, warehouse, and operations","The number of vehicles in the fleet"]},
+ zh:{q:"PCR（派送完成率）指标反映的是什么？",a:["司机的薪资奖金水平","派送成功率，反映司机-仓库-调度之间的协作效果","车队车辆数量"]}},
+{m:6,correct:0,
+ vi:{q:"Mô hình \"trực doanh\" (self-operated network) mà SF Express Trung Quốc áp dụng mang lại lợi ích chính nào?",a:["Kiểm soát chất lượng phối hợp kho vận – tài xế chặt chẽ hơn","Giảm toàn bộ chi phí nhân sự về 0","Không cần đầu tư vào công nghệ"]},
+ en:{q:"What is the main benefit of the \"self-operated network\" model used by SF Express in China?",a:["Tighter quality control over warehouse-driver coordination","Reducing all personnel costs to zero","No need to invest in technology"]},
+ zh:{q:"顺丰速运在中国采用的「直营网络」模式带来的主要好处是什么？",a:["更严格地控制仓配-司机协作的质量","将全部人力成本降为零","无需在技术上投入"]}},
+{m:6,correct:1,
+ vi:{q:"Mục đích chính của buổi họp giao ca đầu ngày (briefing) tại các bưu cục là gì?",a:["Chỉ để điểm danh nhân sự","Đồng bộ thông tin về đơn hàng ưu tiên, tuyến đường thay đổi và lưu ý đặc biệt trong ngày","Thay thế hoàn toàn cho việc đào tạo"]},
+ en:{q:"What is the main purpose of a daily morning briefing at hubs?",a:["Only to take attendance","Align staff on priority orders, route changes, and special notes for the day","Completely replace formal training"]},
+ zh:{q:"网点每日晨会的主要目的是什么？",a:["只是为了点名","同步优先订单、路线变更及当日特别注意事项","完全取代正式培训"]}}
+);
+</script>
+<script>
+let currentLang = 'vi';
+let currentQuestions = [];
+let userAnswers = {};
+let timeLeft = 20*60;
+let timerInterval = null;
+let selectedRating = null;
+let lastStatsResult = null; // cache of last loaded public stats {total,passed,failed,avgPct}, so language switches don't re-query Firestore
+function shuffleArray(array){
+  let arr = [...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function esc(s){ return s; } // content is trusted static i18n data (may include safe <strong>/<i> tags)
+function escUser(s){ // escape untrusted, user-typed form input before it is placed into innerHTML
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+/* ---------- RENDER MODULES ---------- */
+function renderModules(lang){
+  const t = UI[lang];
+  const container = document.getElementById('modules-container');
+  container.innerHTML = '';
+  MODULES.forEach((mod, idx) => {
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    const header = document.createElement('div');
+    header.className = 'module-header';
+    header.innerHTML = `<span>${mod.title[lang]}</span><span class="chevron">▼</span>`;
+    header.onclick = () => {
+      header.classList.toggle('open');
+      body.classList.toggle('open');
+    };
+    const body = document.createElement('div');
+    body.className = 'module-body';
+    body.innerHTML = `<div style="color:#999;font-size:12px;margin-bottom:6px;">${t.moduleHint}</div>`;
+    mod.blocks.forEach(block => {
+      if(block.type === 'list'){
+        const h = document.createElement('h3');
+        h.className = 'section-title';
+        h.textContent = block.heading[lang];
+        body.appendChild(h);
+        const ul = document.createElement('ul');
+        ul.className = 'content-list';
+        block.items.forEach(it => {
+          const li = document.createElement('li');
+          li.innerHTML = it[lang];
+          ul.appendChild(li);
+        });
+        body.appendChild(ul);
+      } else if(block.type === 'theory'){
+        const div = document.createElement('div');
+        div.className = 'theory-box';
+        div.innerHTML = `<div class="tb-title">${t.theoryLabel}</div><div>${block.body[lang]}</div><div class="tb-source">${block.source[lang]}</div>`;
+        body.appendChild(div);
+      } else if(block.type === 'case'){
+        const div = document.createElement('div');
+        div.className = 'case-box';
+        div.innerHTML = `<div class="cb-title">${t.caseLabel}</div><div>${block.body[lang]}</div>`;
+        body.appendChild(div);
+      } else if(block.type === 'table' && block.dosDonts){
+        const h = document.createElement('h3');
+        h.className = 'section-title';
+        h.textContent = block.heading[lang];
+        body.appendChild(h);
+        const wrap = document.createElement('div');
+        wrap.className = 'table-wrap';
+        let rowsHtml = '';
+        block.rows.forEach(r => {
+          rowsHtml += `<tr><td data-label="${t.dosLabel}">${r.dos[lang]}</td><td data-label="${t.dontsLabel}">${r.donts[lang]}</td></tr>`;
+        });
+        wrap.innerHTML = `<table class="stack"><thead><tr><th class="dos">${t.dosLabel}</th><th class="donts">${t.dontsLabel}</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+        body.appendChild(wrap);
+      } else if(block.type === 'checklist'){
+        const h = document.createElement('h3');
+        h.className = 'section-title';
+        h.textContent = block.heading[lang];
+        body.appendChild(h);
+        const box = document.createElement('div');
+        box.className = 'checklist-box';
+        block.items.forEach(it => {
+          const d = document.createElement('div');
+          d.textContent = it[lang];
+          box.appendChild(d);
+        });
+        body.appendChild(box);
+      } else if(block.type === 'scenario'){
+        const h = document.createElement('h3');
+        h.className = 'section-title';
+        h.textContent = block.heading[lang];
+        body.appendChild(h);
+        const wrap = document.createElement('div');
+        wrap.className = 'table-wrap';
+        let rowsHtml = '';
+        block.rows.forEach(r => {
+          rowsHtml += `<tr><td data-label="${t.scenarioLabel1}"><strong>${r.q[lang]}</strong></td><td data-label="${t.scenarioLabel2}">${r.p[lang]}</td><td data-label="${t.scenarioLabel3}">${r.a[lang]}</td></tr>`;
+        });
+        wrap.innerHTML = `<table class="stack"><thead><tr><th>${t.scenarioLabel1}</th><th>${t.scenarioLabel2}</th><th>${t.scenarioLabel3}</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+        body.appendChild(wrap);
+      } else if(block.type === 'flashcards'){
+        const h = document.createElement('h3');
+        h.className = 'section-title';
+        h.textContent = t.flashcardHead;
+        body.appendChild(h);
+        const grid = document.createElement('div');
+        grid.className = 'flashcards-grid';
+        block.items.forEach(fc => {
+          const cc = document.createElement('div');
+          cc.className = 'card-container';
+          cc.onclick = () => cc.querySelector('.card').classList.toggle('flipped');
+          cc.innerHTML = `<div class="card">
+            <div class="card-face card-front">${fc.q[lang]}</div>
+            <div class="card-face card-back">${fc.a[lang]}</div>
+          </div>`;
+          grid.appendChild(cc);
+        });
+        body.appendChild(grid);
+      }
+    });
+    card.appendChild(header);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+/* ---------- RENDER STATIC UI TEXT ---------- */
+function renderUIText(lang){
+  const t = UI[lang];
+  document.getElementById('t-stats-title').textContent = t.statsTitle;
+  document.getElementById('t-stats-from-label').textContent = t.statsFromLabel;
+  document.getElementById('t-stats-to-label').textContent = t.statsToLabel;
+  document.getElementById('btnStatsFilter').textContent = t.statsFilterBtn;
+  document.getElementById('btnStatsReset').textContent = t.statsResetBtn;
+  if(lastStatsResult){ renderStatsTiles(lastStatsResult); }
+  document.getElementById('t-menu-title').textContent = t.menuTitle;
+  document.getElementById('t-menu-item1').textContent = t.menuItem1;
+  document.getElementById('t-menu-item2').textContent = t.menuItem2;
+  document.getElementById('t-menu-item3').textContent = t.menuItem3;
+  document.getElementById('t-menu-item4').textContent = t.menuItem4;
+  document.getElementById('t-menu-soon1').textContent = t.menuSoon;
+  document.getElementById('t-menu-soon2').textContent = t.menuSoon;
+  document.getElementById('t-menu-soon3').textContent = t.menuSoon;
+  document.getElementById('t-main-title').textContent = t.mainTitle;
+  document.getElementById('t-sub-title').textContent = t.subTitle;
+  document.getElementById('t-instr-btn').textContent = t.instrBtn;
+  document.getElementById('t-instr-title').textContent = t.instrTitle;
+  const stepsEl = document.getElementById('instr-steps');
+  stepsEl.innerHTML = '';
+  t.instrSteps.forEach(s => {
+    const li = document.createElement('li');
+    li.innerHTML = s;
+    stepsEl.appendChild(li);
+  });
+  document.getElementById('t-info-group').textContent = t.infoGroup;
+  document.getElementById('validation-alert').textContent = t.alertMissing;
+  document.getElementById('t-lbl-name').textContent = t.lblName;
+  document.getElementById('t-lbl-id').textContent = t.lblID;
+  document.getElementById('driverName').placeholder = t.phName;
+  document.getElementById('driverID').placeholder = t.phID;
+  document.getElementById('t-quiz-banner-title').textContent = t.quizBannerTitle;
+  document.getElementById('t-quiz-sub').innerHTML = t.quizSub;
+  document.getElementById('t-btn-start').textContent = t.btnStart;
+  document.getElementById('t-btn-submit').textContent = t.btnSubmit;
+  document.getElementById('t-rating-label').textContent = t.ratingLabel;
+  document.getElementById('t-rating-hint').textContent = t.ratingHint;
+  document.getElementById('btnSubmitResult').textContent = t.btnSubmitResult;
+  document.getElementById('btnExit').textContent = t.btnExit;
+  document.getElementById('resHeader').textContent = t.resHeader;
+  updateProgressBadge();
+  if(currentQuestions.length){ renderQuestions(lang); }
+  buildRatingScale(lang);
+}
+function renderAll(lang){
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  renderModules(lang);
+  renderUIText(lang);
+}
+/* ---------- QUIZ FLOW ---------- */
+function startQuiz(){
+  const name = document.getElementById('driverName').value.trim();
+  const id = document.getElementById('driverID').value.trim();
+  const alertBox = document.getElementById('validation-alert');
+  if(!name || !id){
+    alertBox.style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+    return;
+  }
+  alertBox.style.display = 'none';
+  const shuffled = shuffleArray(QUESTION_BANK);
+  currentQuestions = shuffled.slice(0, 20);
+  userAnswers = {};
+  renderQuestions(currentLang);
+  document.getElementById('start-banner').style.display = 'none';
+  document.getElementById('quiz-section').style.display = 'block';
+  document.getElementById('quiz-section').scrollIntoView({behavior:'smooth'});
+  startTimer();
+}
+function renderQuestions(lang){
+  const t = UI[lang];
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  currentQuestions.forEach((qObj, index) => {
+    const qNum = index + 1;
+    const qBlock = document.createElement('div');
+    qBlock.className = 'question-block';
+    const labels = ['A','B','C'];
+    let optionsHTML = '';
+    qObj[lang].a.forEach((optText, optIdx) => {
+      const checked = userAnswers[index] === optIdx ? 'checked' : '';
+      optionsHTML += `<label class="option">
+        <input type="radio" name="q${index}" value="${optIdx}" ${checked} onchange="recordAnswer(${index}, ${optIdx})">
+        <span>${labels[optIdx]}. ${optText}</span>
+      </label>`;
+    });
+    qBlock.innerHTML = `<div class="question-title">${t.questionWord} ${qNum}: ${qObj[lang].q}</div>${optionsHTML}`;
+    container.appendChild(qBlock);
+  });
+  updateProgressBadge();
+}
+function recordAnswer(index, value){
+  userAnswers[index] = value;
+  updateProgressBadge();
+}
+function updateProgressBadge(){
+  const el = document.getElementById('progressBadge');
+  if(!el) return;
+  const t = UI[currentLang];
+  const answered = Object.keys(userAnswers).length;
+  el.textContent = currentQuestions.length ? `${t.progressPrefix}: ${answered}/${currentQuestions.length}` : '';
+}
+function startTimer(){
+  timeLeft = 20*60;
+  updateTimerBadge();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerBadge();
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  }, 1000);
+}
+function updateTimerBadge(){
+  const badge = document.getElementById('timerBadge');
+  const m = Math.floor(timeLeft/60);
+  const s = timeLeft % 60;
+  badge.textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  badge.classList.toggle('low', timeLeft <= 60);
+}
+function submitQuiz(){
+  clearInterval(timerInterval);
+  const t = UI[currentLang];
+  const total = currentQuestions.length;
+  let score = 0;
+  const labels = ['A','B','C'];
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  currentQuestions.forEach((qObj, index) => {
+    const chosen = userAnswers[index];
+    const isCorrect = chosen === qObj.correct;
+    if(isCorrect) score++;
+    const div = document.createElement('div');
+    div.className = 'review-item ' + (isCorrect ? 'correct' : 'wrong');
+    const chosenText = (chosen !== undefined) ? `${labels[chosen]}. ${qObj[currentLang].a[chosen]}` : t.notAnswered;
+    const correctText = `${labels[qObj.correct]}. ${qObj[currentLang].a[qObj.correct]}`;
+    div.innerHTML = `<strong>${t.questionWord} ${index+1}:</strong> ${qObj[currentLang].q}<br>${t.yourAnswer}: ${chosenText}${isCorrect ? '' : `<br>${t.correctAnswer}: ${correctText}`}`;
+    reviewList.appendChild(div);
+  });
+  const percentage = Math.round((score/total)*100);
+  const isPassed = score >= 16;
+  const name = document.getElementById('driverName').value.trim();
+  const id = document.getElementById('driverID').value.trim();
+  document.getElementById('resStudentLine').innerHTML = `${t.studentLine}: <strong>${escUser(name)}</strong> | ID: <strong>${escUser(id)}</strong>`;
+  document.getElementById('resScore').textContent = `${score}/${total} (${percentage}%)`;
+  const statusEl = document.getElementById('resStatus');
+  const trophyEl = document.getElementById('resTrophy');
+  if(isPassed){
+    statusEl.className = 'status-pass';
+    statusEl.textContent = t.resPass;
+    trophyEl.textContent = '🏆';
+  } else {
+    statusEl.className = 'status-fail';
+    statusEl.textContent = t.resFail;
+    trophyEl.textContent = '⚠️';
+  }
+  selectedRating = null;
+  document.getElementById('submitRow').style.display = 'block';
+  document.getElementById('exitRow').style.display = 'none';
+  document.getElementById('exitMsg').style.display = 'none';
+  document.getElementById('submitStatus').textContent = '';
+  document.getElementById('ratingRequiredMsg').style.display = 'none';
+  document.getElementById('btnSubmitResult').disabled = false;
+  buildRatingScale(currentLang);
+  document.getElementById('quiz-section').style.display = 'none';
+  document.getElementById('result-block').style.display = 'block';
+  document.getElementById('result-block').scrollIntoView({behavior:'smooth'});
+}
+function buildRatingScale(lang){
+  const scale = document.getElementById('ratingScale');
+  if(!scale) return;
+  scale.innerHTML = '';
+  for(let i=1;i<=10;i++){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'rating-btn' + (selectedRating === i ? ' selected' : '');
+    btn.textContent = i;
+    btn.onclick = () => {
+      selectedRating = i;
+      buildRatingScale(lang);
+      document.getElementById('ratingRequiredMsg').style.display = 'none';
+    };
+    scale.appendChild(btn);
+  }
+}
+/* ---------- SUBMIT TO FIRESTORE ---------- */
+function buildSubmissionPayload(){
+  const name = document.getElementById('driverName').value.trim();
+  const id = document.getElementById('driverID').value.trim();
+  const labels = ['A','B','C'];
+  let score = 0;
+  // Gộp luôn kết quả đúng/sai theo từng kỹ năng (module) để nuôi bảng "Kết quả theo
+  // từng kỹ năng" công khai — chỉ là số liệu tổng hợp (đúng/tổng câu mỗi kỹ năng),
+  // không phải nội dung câu trả lời nên an toàn khi đưa vào collection công khai.
+  const moduleScores = {}; // { '1': {correct, total}, '2': {...}, ... }
+  const questions = currentQuestions.map((qObj, index) => {
+    const chosen = userAnswers[index];
+    const isCorrect = chosen === qObj.correct;
+    if(isCorrect) score++;
+    const mKey = String(qObj.m);
+    if(!moduleScores[mKey]) moduleScores[mKey] = {correct:0, total:0};
+    moduleScores[mKey].total++;
+    if(isCorrect) moduleScores[mKey].correct++;
+    return {
+      question: qObj[currentLang].q,
+      options: qObj[currentLang].a,
+      selectedIndex: (chosen !== undefined) ? chosen : null,
+      selectedText: (chosen !== undefined) ? `${labels[chosen]}. ${qObj[currentLang].a[chosen]}` : null,
+      correctIndex: qObj.correct,
+      correctText: `${labels[qObj.correct]}. ${qObj[currentLang].a[qObj.correct]}`,
+      module: qObj.m,
+      isCorrect
+    };
+  });
+  const total = currentQuestions.length;
+  const percentage = total ? Math.round((score/total)*100) : 0;
+  return {
+    name, employeeId: id,
+    language: currentLang,
+    score, total, percentage,
+    passed: score >= 16,
+    rating: selectedRating,
+    moduleScores,
+    questions,
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    clientSubmittedAt: new Date().toISOString()
+  };
+}
+function submitResultToFirebase(){
+  const t = UI[currentLang];
+  const statusEl = document.getElementById('submitStatus');
+  const reqMsgEl = document.getElementById('ratingRequiredMsg');
+  if(!selectedRating){
+    reqMsgEl.textContent = t.ratingRequiredMsg;
+    reqMsgEl.style.display = 'block';
+    reqMsgEl.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  reqMsgEl.style.display = 'none';
+  if(!FIREBASE_CONFIGURED || !db){
+    statusEl.style.color = 'var(--fail-red)';
+    statusEl.textContent = t.notConfiguredMsg;
+    return;
+  }
+  const btn = document.getElementById('btnSubmitResult');
+  btn.disabled = true;
+  statusEl.style.color = '#555';
+  statusEl.textContent = t.submittingMsg;
+  // Ghi 2 bản ghi riêng biệt trong cùng 1 batch (đảm bảo cùng thành công/thất bại):
+  //  - quiz_submissions: đầy đủ tên/ID/chi tiết câu trả lời (chỉ admin đọc được qua Firebase Console).
+  //  - quiz_stats_public: KHÔNG chứa tên/ID, chỉ có điểm số + kết quả theo từng kỹ năng + đánh giá —
+  //    toàn là số liệu tổng hợp, không định danh được ai — an toàn để mọi người đọc công khai
+  //    cho bảng thống kê ở đầu trang.
+  const payload = buildSubmissionPayload();
+  const publicStats = {
+    score: payload.score,
+    total: payload.total,
+    percentage: payload.percentage,
+    passed: payload.passed,
+    rating: payload.rating,
+    moduleScores: payload.moduleScores,
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  const batch = db.batch();
+  batch.set(db.collection('quiz_submissions').doc(), payload);
+  batch.set(db.collection('quiz_stats_public').doc(), publicStats);
+  batch.commit().then(() => {
+    statusEl.style.color = 'var(--pass-green)';
+    statusEl.textContent = t.submitSuccessMsg;
+    document.getElementById('submitRow').style.display = 'none';
+    document.getElementById('exitRow').style.display = 'flex';
+    loadPublicStats(); // cập nhật ngay bảng thống kê ở đầu trang với bài vừa nộp
+  }).catch((err) => {
+    console.error('Lỗi khi nộp bài lên Firestore:', err);
+    statusEl.style.color = 'var(--fail-red)';
+    statusEl.textContent = t.submitErrorMsg;
+    btn.disabled = false;
+  });
+}
+/* ---------- PUBLIC STATS DASHBOARD (chỉ hiện số lượng, không có tên/email) ---------- */
+// Vẽ biểu đồ donut (Đạt/Chưa đạt) + các ô tóm tắt. Rê chuột (hover) vào từng phần
+// của donut sẽ hiện tooltip cho biết số người và tỉ lệ % của phần đó.
+function renderStatsTiles(result){
+  const t = UI[currentLang];
+  lastStatsResult = result;
+  const dash = document.getElementById('statsDashboard');
+  dash.innerHTML = '';
+  if(!result.total){
+    const empty = document.createElement('div');
+    empty.className = 'stats-empty';
+    empty.textContent = t.statsEmpty;
+    dash.appendChild(empty);
+    document.getElementById('statsModules').innerHTML = '';
+    document.getElementById('statsRating').innerHTML = '';
+    return;
+  }
+  const r = 54, cx = 70, cy = 70, sw = 18;
+  const circumference = 2 * Math.PI * r;
+  const passedPct = Math.round((result.passed / result.total) * 100);
+  const failedPct = 100 - passedPct;
+  const passedLen = (result.passed / result.total) * circumference;
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', '0 0 140 140');
+  const bg = document.createElementNS(svgNS, 'circle');
+  bg.setAttribute('cx', cx); bg.setAttribute('cy', cy); bg.setAttribute('r', r);
+  bg.setAttribute('fill', 'none'); bg.setAttribute('stroke', '#E0E0E0'); bg.setAttribute('stroke-width', sw);
+  svg.appendChild(bg);
+  const g = document.createElementNS(svgNS, 'g');
+  g.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+  svg.appendChild(g);
+
+  function addSeg(len, offset, color, tooltipText){
+    if(len <= 0) return;
+    const c = document.createElementNS(svgNS, 'circle');
+    c.setAttribute('class', 'stats-donut-seg');
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', r);
+    c.setAttribute('fill', 'none');
+    c.setAttribute('stroke', color);
+    c.setAttribute('stroke-width', sw);
+    c.setAttribute('stroke-dasharray', `${len} ${circumference - len}`);
+    c.setAttribute('stroke-dashoffset', String(offset));
+    c.addEventListener('mouseenter', (e) => showStatsTooltip(e, tooltipText));
+    c.addEventListener('mousemove', (e) => moveStatsTooltip(e));
+    c.addEventListener('mouseleave', hideStatsTooltip);
+    g.appendChild(c);
+  }
+  addSeg(passedLen, 0, '#2E7D32', `${t.statsPassed}: ${result.passed}${t.statsPeopleUnit} (${passedPct}%)`);
+  addSeg(circumference - passedLen, -passedLen, '#C62828', `${t.statsFailed}: ${result.failed}${t.statsPeopleUnit} (${failedPct}%)`);
+
+  const donutWrap = document.createElement('div');
+  donutWrap.className = 'stats-donut-wrap';
+  donutWrap.appendChild(svg);
+  const center = document.createElement('div');
+  center.className = 'stats-donut-center';
+  center.innerHTML = `<div class="stat-num">${result.total}</div><div class="stat-label">${t.statsTotal}</div>`;
+  donutWrap.appendChild(center);
+
+  const sideTiles = document.createElement('div');
+  sideTiles.className = 'stats-side-tiles';
+  sideTiles.innerHTML = `
+    <div class="stat-tile pass"><div class="stat-num">${result.passed}</div><div class="stat-label">${t.statsPassed}</div></div>
+    <div class="stat-tile fail"><div class="stat-num">${result.failed}</div><div class="stat-label">${t.statsFailed}</div></div>
+    <div class="stat-tile"><div class="stat-num">${result.avgPct}%</div><div class="stat-label">${t.statsAvg}</div></div>
+  `;
+
+  dash.appendChild(donutWrap);
+  dash.appendChild(sideTiles);
+  renderStatsModules(result);
+  renderStatsRating(result);
+}
+// Kết quả theo từng kỹ năng (module): % câu trả lời đúng, gộp từ toàn bộ lượt nộp bài
+// trong khoảng thời gian đang lọc — dùng moduleScores công khai (không có nội dung câu hỏi).
+function renderStatsModules(result){
+  const t = UI[currentLang];
+  const wrap = document.getElementById('statsModules');
+  wrap.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'stats-section-title';
+  title.textContent = t.statsModulesTitle;
+  wrap.appendChild(title);
+  const grid = document.createElement('div');
+  grid.className = 'stats-modules-grid';
+  const moduleAgg = result.moduleAgg || {};
+  MODULES.forEach(mod => {
+    const mKey = mod.id.replace('m', '');
+    const agg = moduleAgg[mKey];
+    const pct = (agg && agg.total) ? Math.round((agg.correct / agg.total) * 100) : 0;
+    const row = document.createElement('div');
+    row.className = 'module-stat-row';
+    row.innerHTML = `
+      <div class="module-stat-top">
+        <span class="module-stat-label">${mod.title[currentLang]}</span>
+        <span class="module-stat-pct">${pct}%</span>
+      </div>
+      <div class="module-stat-bar"><div class="module-stat-fill" style="width:${pct}%;"></div></div>
+    `;
+    grid.appendChild(row);
+  });
+  wrap.appendChild(grid);
+}
+// Đánh giá mức độ hài lòng trung bình (thang 1-10) hiển thị dạng sao vàng (5 sao, lấp
+// đầy tỉ lệ theo % của thang 10) kèm số cụ thể.
+function renderStatsRating(result){
+  const t = UI[currentLang];
+  const wrap = document.getElementById('statsRating');
+  wrap.innerHTML = '';
+  const avgRating = result.avgRating || 0;
+  const fillPct = Math.max(0, Math.min(100, (avgRating / 10) * 100));
+  const title = document.createElement('div');
+  title.className = 'stats-section-title';
+  title.textContent = t.statsRatingTitle;
+  wrap.appendChild(title);
+  const row = document.createElement('div');
+  row.className = 'stats-rating-row';
+  const starsWrap = document.createElement('span');
+  starsWrap.className = 'stars-wrap';
+  starsWrap.style.setProperty('--fill', fillPct + '%');
+  starsWrap.innerHTML = `<span class="stars-bg">★★★★★</span><span class="stars-fg">★★★★★</span>`;
+  const numEl = document.createElement('span');
+  numEl.className = 'stats-rating-num';
+  numEl.textContent = `${avgRating.toFixed(1)}/10`;
+  row.appendChild(starsWrap);
+  row.appendChild(numEl);
+  wrap.appendChild(row);
+}
+function showStatsTooltip(e, text){
+  const tip = document.getElementById('statsTooltip');
+  tip.textContent = text;
+  tip.style.display = 'block';
+  moveStatsTooltip(e);
+}
+function moveStatsTooltip(e){
+  const tip = document.getElementById('statsTooltip');
+  tip.style.left = (e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY + 12) + 'px';
+}
+function hideStatsTooltip(){
+  document.getElementById('statsTooltip').style.display = 'none';
+}
+function loadPublicStats(){
+  const t = UI[currentLang];
+  const dash = document.getElementById('statsDashboard');
+  const loadingEl = document.getElementById('statsLoading');
+  if(!FIREBASE_CONFIGURED || !db){
+    dash.innerHTML = '';
+    loadingEl.style.display = 'block';
+    loadingEl.textContent = t.statsNotConfigured;
+    return;
+  }
+  loadingEl.style.display = 'block';
+  loadingEl.textContent = t.statsLoading;
+  dash.innerHTML = '';
+  let q = db.collection('quiz_stats_public');
+  const fromVal = document.getElementById('statsFrom').value;
+  const toVal = document.getElementById('statsTo').value;
+  if(fromVal){
+    q = q.where('submittedAt', '>=', new Date(fromVal + 'T00:00:00'));
+  }
+  if(toVal){
+    q = q.where('submittedAt', '<=', new Date(toVal + 'T23:59:59.999'));
+  }
+  q.get().then(snapshot => {
+    let total = 0, passed = 0, sumPct = 0, sumRating = 0, ratingCount = 0;
+    const moduleAgg = {}; // { '1': {correct, total}, ..., '6': {...} }
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      total++;
+      if(d.passed) passed++;
+      sumPct += (typeof d.percentage === 'number') ? d.percentage : 0;
+      if(typeof d.rating === 'number'){
+        sumRating += d.rating;
+        ratingCount++;
+      }
+      if(d.moduleScores && typeof d.moduleScores === 'object'){
+        Object.keys(d.moduleScores).forEach(mKey => {
+          const ms = d.moduleScores[mKey] || {};
+          if(!moduleAgg[mKey]) moduleAgg[mKey] = {correct:0, total:0};
+          moduleAgg[mKey].correct += ms.correct || 0;
+          moduleAgg[mKey].total += ms.total || 0;
+        });
+      }
+    });
+    const failed = total - passed;
+    const avgPct = total ? Math.round(sumPct/total) : 0;
+    const avgRating = ratingCount ? (sumRating/ratingCount) : 0;
+    loadingEl.style.display = 'none';
+    renderStatsTiles({total, passed, failed, avgPct, avgRating, moduleAgg});
+  }).catch(err => {
+    console.error('Lỗi tải thống kê công khai:', err);
+    loadingEl.style.display = 'block';
+    loadingEl.textContent = t.statsError;
+    dash.innerHTML = '';
+    document.getElementById('statsModules').innerHTML = '';
+    document.getElementById('statsRating').innerHTML = '';
+  });
+}
+// Sau khi nộp bài xong, bài thi coi như hoàn tất — không cho làm lại trên cùng
+// một phiên nữa, chỉ còn nút Thoát. window.close() chỉ thực sự đóng được tab nếu
+// tab này được mở bằng script; với tab mở bình thường trình duyệt sẽ chặn (im lặng,
+// không báo lỗi) nên luôn hiện thêm hướng dẫn tự đóng tab để chắc chắn người dùng
+// biết cách thoát.
+function exitTest(){
+  const t = UI[currentLang];
+  try{ window.close(); }catch(e){}
+  const hint = document.getElementById('exitMsg');
+  hint.textContent = t.exitHint;
+  hint.style.display = 'block';
+}
+/* ---------- MENU ---------- */
+function toggleMenu(forceClose){
+  const menu = document.getElementById('dropdownMenu');
+  const btn = document.getElementById('btnMenu');
+  const backdrop = document.getElementById('menuBackdrop');
+  const willOpen = forceClose === true ? false : !menu.classList.contains('open');
+  menu.classList.toggle('open', willOpen);
+  btn.classList.toggle('open', willOpen);
+  backdrop.classList.toggle('open', willOpen);
+}
+/* ---------- INIT / EVENTS ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnMenu').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+  document.getElementById('menuBackdrop').addEventListener('click', () => toggleMenu(true));
+  document.querySelectorAll('.dropdown-item:not(.disabled)').forEach(item => {
+    item.addEventListener('click', () => toggleMenu(true));
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => renderAll(btn.dataset.lang));
+  });
+  document.getElementById('btnInstructions').addEventListener('click', () => {
+    document.getElementById('instructionsModal').classList.add('open');
+  });
+  document.getElementById('btnCloseInstr').addEventListener('click', () => {
+    document.getElementById('instructionsModal').classList.remove('open');
+  });
+  document.getElementById('t-btn-start').addEventListener('click', startQuiz);
+  document.getElementById('t-btn-submit').addEventListener('click', submitQuiz);
+  document.getElementById('btnSubmitResult').addEventListener('click', submitResultToFirebase);
+  document.getElementById('btnExit').addEventListener('click', exitTest);
+  document.getElementById('btnStatsFilter').addEventListener('click', loadPublicStats);
+  document.getElementById('btnStatsReset').addEventListener('click', () => {
+    document.getElementById('statsFrom').value = '';
+    document.getElementById('statsTo').value = '';
+    loadPublicStats();
+  });
+  document.getElementById('statsToggle').addEventListener('click', () => {
+    const toggle = document.getElementById('statsToggle');
+    const body = document.getElementById('statsBody');
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    body.style.display = expanded ? 'none' : 'block';
+  });
+  renderAll('vi');
+  loadPublicStats();
+});
+</script>
+</body>
+</html>
