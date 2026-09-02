@@ -337,109 +337,48 @@ th.donts{background:#FFEBEE;color:#C62828;}
 </div>
 </div>
 
-<!-- ===== FIREBASE (nộp bài) ===== -->
-<!-- Firebase SDK (bản compat, dùng được trực tiếp qua thẻ script HTML thường) -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<!-- ===== CLOUDFLARE (nộp bài qua Worker + D1) ===== -->
 <script>
 /* ============================================================
-   CẤU HÌNH FIREBASE — BẮT BUỘC ĐIỀN TRƯỚC KHI DÙNG THẬT
-   1. Vào https://console.firebase.google.com → Tạo dự án mới (Add project).
-   2. Trong dự án, vào Build → Firestore Database → Create database
-      (chọn chế độ Production, khu vực gần Việt Nam, ví dụ asia-southeast1).
-   3. Vào Project settings (biểu tượng bánh răng) → General → mục "Your apps"
-      → bấm biểu tượng Web "</>" để tạo Web app → copy đoạn firebaseConfig.
-   4. Dán đè object bên dưới bằng config vừa copy.
-   5. Vào Firestore Database → tab Rules, dán đúng nội dung sau rồi bấm Publish:
+   CẤU HÌNH CLOUDFLARE WORKER — BẮT BUỘC ĐIỀN TRƯỚC KHI DÙNG THẬT
+   Backend không còn dùng Firebase/Firestore nữa — mọi lượt nộp bài và thống kê
+   công khai giờ đi qua 1 Cloudflare Worker (file worker.js đi kèm) có gắn 1
+   Cloudflare D1 database (SQLite chạy trên Cloudflare, tương đương Firestore).
 
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-            // ===== Chương trình 1: Kỹ Năng Mềm (chính file index.html này) =====
-            // Bản ghi ĐẦY ĐỦ: tên, ID nhân viên, chi tiết từng câu trả lời.
-            match /quiz_submissions/{docId} {
-              allow create: if true;   // ai cũng nộp được bài (không cần đăng nhập)
-              allow read, update, delete: if false; // KHÔNG ai đọc/sửa/xoá được từ trình duyệt
-            }
-            // Bản ghi CÔNG KHAI cho bảng thống kê đầu trang: điểm số + thời gian +
-            // kết quả đúng/sai theo từng kỹ năng (module) + đánh giá 1-10, đều là số liệu
-            // tổng hợp. KHÔNG chứa tên/ID/nội dung câu hỏi — an toàn để mọi người đọc.
-            match /quiz_stats_public/{docId} {
-              allow create: if true;
-              allow read: if true;
-              allow update, delete: if false;
-            }
+   1. Tạo D1 database:  npx wrangler d1 create sfexpress-quiz
+   2. Chạy schema:      npx wrangler d1 execute sfexpress-quiz --remote --file=./schema.sql
+   3. Điền database_id vào wrangler.toml (lấy từ output bước 1).
+   4. Deploy worker:    npx wrangler deploy
+      → copy URL Worker vừa deploy (dạng https://<tên-worker>.<subdomain>.workers.dev).
+   5. Dán URL đó vào hằng số WORKER_BASE_URL bên dưới (KHÔNG có dấu / ở cuối).
+   6. Cấu hình CORS: Worker mặc định cho phép mọi origin gọi vào (allow-all) — nếu
+      muốn giới hạn chỉ domain lưu trữ trang này được gọi, sửa ALLOWED_ORIGIN trong
+      worker.js.
 
-            // ===== Các chương trình đào tạo tiếp theo (Nghiệp vụ giao nhận, An toàn
-            // giao thông, Quy trình vận hành nội bộ...) =====
-            // Mỗi chương trình mới nên dùng 1 CẶP COLLECTION RIÊNG (không dùng chung 2
-            // collection ở trên) để số liệu thống kê của từng chương trình tách bạch
-            // hoàn toàn, không lẫn vào nhau — đặt tên theo mẫu:
-            //   quiz_submissions_<tên-chương-trình>  /  quiz_stats_public_<tên-chương-trình>
-            //   (ví dụ: quiz_submissions_giao-nhan, quiz_stats_public_an-toan-giao-thong...)
-            // 2 khối bên dưới dùng ký tự đại diện {collection} nên sẽ TỰ ĐỘNG áp dụng cho
-            // MỌI collection đặt tên đúng mẫu này — mở chương trình mới KHÔNG cần quay lại
-            // đây sửa Rules nữa, chỉ cần file HTML của chương trình mới dùng đúng mẫu tên.
-            match /{collection}/{docId} {
-              allow create: if collection.matches('^quiz_submissions_.+$');
-              allow read, update, delete: if false;
-            }
-            match /{collection}/{docId} {
-              allow create: if collection.matches('^quiz_stats_public_.+$');
-              allow read: if collection.matches('^quiz_stats_public_.+$');
-              allow update, delete: if false;
-            }
-          }
-        }
+      Muốn xem danh sách tên/ID người đã làm bài (dữ liệu đầy đủ, không public):
+        npx wrangler d1 execute sfexpress-quiz --remote \
+          --command="SELECT * FROM quiz_submissions ORDER BY submitted_at DESC"
+      (tương đương việc trước đây phải vào Firebase Console xem collection
+      "quiz_submissions" — giờ dùng lệnh wrangler hoặc tab D1 trên Cloudflare Dashboard).
 
-      Quy tắc này CHẶN việc đọc lại dữ liệu có tên thật (mọi collection quiz_submissions*),
-      chỉ cho phép TẠO MỚI bản ghi ở đó. Muốn xem danh sách tên/ID người đã làm bài,
-      vào thẳng Firebase Console (Firestore Database → collection "quiz_submissions").
-      Mọi collection quiz_stats_public* thì cho phép đọc công khai vì không chứa thông tin
-      cá nhân — đây là dữ liệu nuôi bảng thống kê số lượng ở đầu mỗi trang.
-
-      LƯU Ý QUAN TRỌNG khi thêm chương trình đào tạo mới (2, 3, 4...): file HTML của
-      chương trình đó PHẢI đổi tên 2 collection trong code (tìm 'quiz_submissions' và
-      'quiz_stats_public' trong file, thêm hậu tố _<tên-chương-trình>) — KHÔNG được giữ
-      nguyên tên 'quiz_submissions'/'quiz_stats_public' của Chương trình 1, nếu không dữ
-      liệu của 2 chương trình sẽ bị gộp lẫn vào nhau. Cũng tuyệt đối KHÔNG đổi tên 2
-      collection của Chương trình 1 (file này) — đổi tên sẽ làm dữ liệu/thống kê đã có
-      của Kỹ Năng Mềm bị "reset về 0" vì Firestore sẽ xem đó là collection hoàn toàn mới.
+      LƯU Ý QUAN TRỌNG khi thêm chương trình đào tạo mới (2, 3, 4...): KHÔNG cần tạo
+      database hay Worker mới — mọi chương trình dùng CHUNG 1 Worker + 1 D1 database,
+      chỉ cần đổi PROGRAM_ID (xem bên dưới) để tách bạch dữ liệu theo cột program_id
+      trong 2 bảng quiz_submissions / quiz_stats_public. Tuyệt đối KHÔNG đổi PROGRAM_ID
+      của Chương trình 1 - Kỹ Năng Mềm (giữ nguyên chuỗi rỗng ""), nếu không dữ liệu/
+      thống kê cũ sẽ coi như thuộc chương trình khác và không còn hiện ra nữa.
    ============================================================ */
-const firebaseConfig = {
-  apiKey: "AIzaSyCS3fCvOukNUmlw4KqPOewTdtmL7ReDKvU",
-  authDomain: "sf-express-3fe07.firebaseapp.com",
-  databaseURL: "https://sf-express-3fe07-default-rtdb.firebaseio.com",
-  projectId: "sf-express-3fe07",
-  storageBucket: "sf-express-3fe07.firebasestorage.app",
-  messagingSenderId: "90922574232",
-  appId: "1:90922574232:web:bffb5a8a336e3064efcbed",
-  measurementId: "G-3HMY76VP55"
-};
-// ID của chương trình đào tạo này — quyết định tên 2 collection Firestore bên dưới, để
+const WORKER_BASE_URL = "https://sfexpress-quiz-worker.nam-nk.workers.dev";
+
+// ID của chương trình đào tạo này — quyết định giá trị cột program_id ghi vào D1, để
 // tách bạch dữ liệu/thống kê giữa các chương trình đào tạo (xem LƯU Ý ở khối comment trên).
-// Chương trình 1 - Kỹ Năng Mềm (chính file này): GIỮ NGUYÊN chuỗi rỗng "" — đừng đổi,
-// đổi sẽ khiến Firestore coi đây là collection mới và làm "mất" toàn bộ thống kê đã có.
+// Chương trình 1 - Kỹ Năng Mềm (chính file này): GIỮ NGUYÊN chuỗi rỗng "" — đừng đổi.
 // Khi nhân bản file này để làm chương trình đào tạo tiếp theo, chỉ cần đổi DUY NHẤT dòng
 // này, ví dụ: "_giao-nhan", "_an-toan-giao-thong", "_van-hanh-noi-bo" (giữ dấu _ ở đầu,
-// không dấu, không khoảng trắng) — không cần sửa gì thêm ở các chỗ dùng collection khác.
+// không dấu, không khoảng trắng) — không cần sửa gì thêm ở các chỗ gọi API khác.
 const PROGRAM_ID = "";
-const SUBMISSIONS_COLLECTION = "quiz_submissions" + PROGRAM_ID;
-const PUBLIC_STATS_COLLECTION = "quiz_stats_public" + PROGRAM_ID;
 
-const FIREBASE_CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
-let db = null;
-if(FIREBASE_CONFIGURED){
-  try{
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-  }catch(e){
-    console.error('Lỗi khởi tạo Firebase:', e);
-    db = null;
-  }
-} else {
-  console.warn('Chưa cấu hình Firebase — sửa firebaseConfig trong file index.html trước khi dùng thật.');
-}
+const BACKEND_CONFIGURED = !WORKER_BASE_URL.includes("YOUR-SUBDOMAIN");
 </script>
 
 <script>
@@ -457,7 +396,7 @@ vi:{
   statsFailed:"Chưa đạt",
   statsAvg:"Điểm TB",
   statsLoading:"Đang tải thống kê...",
-  statsNotConfigured:"Chưa cấu hình Firebase nên chưa có thống kê.",
+  statsNotConfigured:"Chưa cấu hình hệ thống nên chưa có thống kê.",
   statsError:"Không tải được thống kê, vui lòng thử lại.",
   statsEmpty:"Chưa có ai làm bài trong khoảng thời gian này.",
   statsPeopleUnit:" người",
@@ -538,7 +477,7 @@ en:{
   statsFailed:"Not Passed",
   statsAvg:"Avg. Score",
   statsLoading:"Loading statistics...",
-  statsNotConfigured:"Firebase is not configured yet, so no statistics are available.",
+  statsNotConfigured:"The backend is not configured yet, so no statistics are available.",
   statsError:"Could not load statistics, please try again.",
   statsEmpty:"No one has taken the test in this period yet.",
   statsPeopleUnit:"",
@@ -619,7 +558,7 @@ zh:{
   statsFailed:"未通过",
   statsAvg:"平均分",
   statsLoading:"正在加载统计数据...",
-  statsNotConfigured:"尚未配置Firebase，暂无统计数据。",
+  statsNotConfigured:"尚未配置后端，暂无统计数据。",
   statsError:"加载统计数据失败，请重试。",
   statsEmpty:"该时间段内暂无人提交测试。",
   statsPeopleUnit:"人",
@@ -909,7 +848,7 @@ blocks:[
    en:"<strong>Route Optimization:</strong> Sequence pickup/delivery stops along the shortest, most logical route before leaving the depot.",
    zh:"<strong>路线优化：</strong>出库前按最短、最合理的路线安排取送货顺序。"},
   {vi:"<strong>Tuân thủ khung giờ Cut-off & Lịch hẹn:</strong> Đảm bảo lấy hàng kịp thời gian xuất chuyến cố định và giao đúng khung giờ cam kết với khách.",
-   en:"<strong>Follow Cut-off times & appointments:</strong> Ensure pickups meet the fixed dispatch time and deliveries meet the committed time window.",
+   en:"<strong>Follow cut-off times & appointments:</strong> Ensure pickups meet the fixed dispatch time and deliveries meet the committed time window.",
    zh:"<strong>遵守截单时间与预约：</strong>确保按固定发车时间完成取件，并在承诺的时间段内送达。"},
   {vi:"<strong>Cam kết giờ hẹn với khách hàng:</strong> Khi khách hẹn giờ cụ thể để giao/nhận hàng (VD: 10:00 sáng hôm sau), nhân viên phải chủ động sắp xếp lịch trình để đáp ứng đúng hẹn, lấy khách hàng làm trọng tâm. Trường hợp bất khả kháng không thể sắp xếp được, phải chủ động gọi điện thông báo, thỏa thuận lại và chỉ thay đổi khi nhận được sự đồng ý của khách.",
    en:"<strong>Honoring appointment times with customers:</strong> When a customer sets a specific pickup/delivery time (e.g., 10:00 AM the next day), staff must proactively arrange their schedule to meet it, keeping the customer at the center. If this is truly impossible, staff must proactively call to explain, renegotiate, and only change the plan once the customer agrees.",
@@ -1246,7 +1185,7 @@ let userAnswers = {};
 let timeLeft = 20*60;
 let timerInterval = null;
 let selectedRating = null;
-let lastStatsResult = null; // cache of last loaded public stats {total,passed,failed,avgPct}, so language switches don't re-query Firestore
+let lastStatsResult = null; // cache of last loaded public stats {total,passed,failed,avgPct}, so language switches don't re-query the Worker
 function shuffleArray(array){
   let arr = [...array];
   for(let i=arr.length-1;i>0;i--){
@@ -1559,7 +1498,7 @@ function buildRatingScale(lang){
     scale.appendChild(btn);
   }
 }
-/* ---------- SUBMIT TO FIRESTORE ---------- */
+/* ---------- SUBMIT TO CLOUDFLARE WORKER (D1) ---------- */
 function buildSubmissionPayload(){
   const name = document.getElementById('driverName').value.trim();
   const id = document.getElementById('driverID').value.trim();
@@ -1598,11 +1537,10 @@ function buildSubmissionPayload(){
     rating: selectedRating,
     moduleScores,
     questions,
-    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
     clientSubmittedAt: new Date().toISOString()
   };
 }
-function submitResultToFirebase(){
+function submitResultToBackend(){
   const t = UI[currentLang];
   const statusEl = document.getElementById('submitStatus');
   const reqMsgEl = document.getElementById('ratingRequiredMsg');
@@ -1613,7 +1551,7 @@ function submitResultToFirebase(){
     return;
   }
   reqMsgEl.style.display = 'none';
-  if(!FIREBASE_CONFIGURED || !db){
+  if(!BACKEND_CONFIGURED){
     statusEl.style.color = 'var(--fail-red)';
     statusEl.textContent = t.notConfiguredMsg;
     return;
@@ -1622,8 +1560,10 @@ function submitResultToFirebase(){
   btn.disabled = true;
   statusEl.style.color = '#555';
   statusEl.textContent = t.submittingMsg;
-  // Ghi 2 bản ghi riêng biệt trong cùng 1 batch (đảm bảo cùng thành công/thất bại):
-  //  - quiz_submissions: đầy đủ tên/ID/chi tiết câu trả lời (chỉ admin đọc được qua Firebase Console).
+  // Gửi 1 request duy nhất lên Worker, Worker ghi 2 bản ghi vào D1 trong cùng 1
+  // transaction (đảm bảo cùng thành công/thất bại), tương đương batch() của Firestore:
+  //  - quiz_submissions: đầy đủ tên/ID/chi tiết câu trả lời (chỉ admin xem được qua
+  //    wrangler d1 execute hoặc tab D1 trên Cloudflare Dashboard).
   //  - quiz_stats_public: KHÔNG chứa tên/ID, chỉ có điểm số + kết quả theo từng kỹ năng + đánh giá —
   //    toàn là số liệu tổng hợp, không định danh được ai — an toàn để mọi người đọc công khai
   //    cho bảng thống kê ở đầu trang.
@@ -1634,20 +1574,23 @@ function submitResultToFirebase(){
     percentage: payload.percentage,
     passed: payload.passed,
     rating: payload.rating,
-    moduleScores: payload.moduleScores,
-    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    moduleScores: payload.moduleScores
   };
-  const batch = db.batch();
-  batch.set(db.collection(SUBMISSIONS_COLLECTION).doc(), payload);
-  batch.set(db.collection(PUBLIC_STATS_COLLECTION).doc(), publicStats);
-  batch.commit().then(() => {
+  fetch(`${WORKER_BASE_URL}/api/submit`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ programId: PROGRAM_ID, payload, publicStats })
+  }).then(res => {
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(() => {
     statusEl.style.color = 'var(--pass-green)';
     statusEl.textContent = t.submitSuccessMsg;
     document.getElementById('submitRow').style.display = 'none';
     document.getElementById('exitRow').style.display = 'flex';
     loadPublicStats(); // cập nhật ngay bảng thống kê ở đầu trang với bài vừa nộp
   }).catch((err) => {
-    console.error('Lỗi khi nộp bài lên Firestore:', err);
+    console.error('Lỗi khi nộp bài lên Cloudflare Worker:', err);
     statusEl.style.color = 'var(--fail-red)';
     statusEl.textContent = t.submitErrorMsg;
     btn.disabled = false;
@@ -1817,7 +1760,7 @@ function loadPublicStats(){
   const t = UI[currentLang];
   const dash = document.getElementById('statsDashboard');
   const loadingEl = document.getElementById('statsLoading');
-  if(!FIREBASE_CONFIGURED || !db){
+  if(!BACKEND_CONFIGURED){
     dash.innerHTML = '';
     loadingEl.style.display = 'block';
     loadingEl.textContent = t.statsNotConfigured;
@@ -1826,20 +1769,18 @@ function loadPublicStats(){
   loadingEl.style.display = 'block';
   loadingEl.textContent = t.statsLoading;
   dash.innerHTML = '';
-  let q = db.collection(PUBLIC_STATS_COLLECTION);
   const fromVal = document.getElementById('statsFrom').value;
   const toVal = document.getElementById('statsTo').value;
-  if(fromVal){
-    q = q.where('submittedAt', '>=', new Date(fromVal + 'T00:00:00'));
-  }
-  if(toVal){
-    q = q.where('submittedAt', '<=', new Date(toVal + 'T23:59:59.999'));
-  }
-  q.get().then(snapshot => {
+  const params = new URLSearchParams({ programId: PROGRAM_ID });
+  if(fromVal) params.set('from', fromVal + 'T00:00:00');
+  if(toVal) params.set('to', toVal + 'T23:59:59.999');
+  fetch(`${WORKER_BASE_URL}/api/stats?${params.toString()}`).then(res => {
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(rows => {
     let total = 0, passed = 0, sumPct = 0, sumRating = 0, ratingCount = 0;
     const moduleAgg = {}; // { '1': {correct, total}, ..., '6': {...} }
-    snapshot.forEach(doc => {
-      const d = doc.data();
+    rows.forEach(d => {
       total++;
       if(d.passed) passed++;
       sumPct += (typeof d.percentage === 'number') ? d.percentage : 0;
@@ -1914,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('t-btn-start').addEventListener('click', startQuiz);
   document.getElementById('t-btn-submit').addEventListener('click', submitQuiz);
-  document.getElementById('btnSubmitResult').addEventListener('click', submitResultToFirebase);
+  document.getElementById('btnSubmitResult').addEventListener('click', submitResultToBackend);
   document.getElementById('btnExit').addEventListener('click', exitTest);
   document.getElementById('btnStatsFilter').addEventListener('click', loadPublicStats);
   document.getElementById('btnStatsReset').addEventListener('click', () => {
