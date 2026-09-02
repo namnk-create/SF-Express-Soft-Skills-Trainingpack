@@ -215,6 +215,8 @@ th.donts{background:#FFEBEE;color:#C62828;}
 .menu-accordion-item-date{font-size:10.5px;color:#888;margin-bottom:3px;}
 .menu-accordion-item-content{font-size:11.5px;color:var(--sf-dark-grey);margin-top:3px;line-height:1.5;}
 .menu-accordion-empty{padding:12px 16px;font-size:12px;color:#999;}
+@keyframes flashHighlightAnim{0%{background:#FFF3CD;box-shadow:0 0 0 3px #FFE082;}100%{background:transparent;box-shadow:none;}}
+.flash-highlight{animation:flashHighlightAnim 1.3s ease;border-radius:6px;}
 .alert-modal{display:none;background:#FFEBEE;color:#C62828;border:1px solid #EF9A9A;padding:12px 16px;border-radius:6px;margin-bottom:15px;font-weight:600;font-size:14px;}
 /* Instructions modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;padding:16px;overflow-y:auto;}
@@ -243,13 +245,16 @@ th.donts{background:#FFEBEE;color:#C62828;}
 .gate-box button{width:100%;background:var(--sf-red);color:#fff;border:none;padding:13px;border-radius:6px;font-weight:800;font-size:15px;cursor:pointer;min-height:48px;}
 .gate-error{display:none;background:#FFEBEE;color:#C62828;border:1px solid #EF9A9A;padding:10px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;font-weight:600;text-align:left;}
 /* ===== ADMIN PANEL ===== */
-.admin-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;background:var(--sf-grey);padding:10px;border-radius:8px;}
 .admin-tab-btn{background:#fff;border:1px solid var(--sf-border);padding:9px 14px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;}
 .admin-tab-btn.active{background:var(--sf-red);color:#fff;border-color:var(--sf-red);}
 .admin-panel{display:none;}
 .admin-panel.active{display:block;}
 .admin-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
 .admin-row input, .admin-row select, .admin-row textarea{padding:9px 10px;border:1px solid var(--sf-border);border-radius:6px;font-size:13px;min-height:38px;flex:1;min-width:110px;}
+.labeled-field{display:flex;flex-direction:column;gap:3px;flex:0 0 auto;}
+.labeled-field label{font-size:11px;font-weight:700;color:var(--sf-dark-grey);white-space:nowrap;}
+.labeled-field input{width:100%;}
 .admin-row textarea{min-height:90px;width:100%;font-family:monospace;font-size:12px;}
 .admin-btn-add{background:var(--pass-green);color:#fff;border:none;border-radius:6px;width:38px;height:38px;font-size:18px;font-weight:900;cursor:pointer;flex-shrink:0;}
 .admin-btn-del{background:var(--fail-red);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;}
@@ -272,7 +277,8 @@ th.donts{background:#FFEBEE;color:#C62828;}
 .admin-storage-bar-fill.danger{background:var(--fail-red);}
 .admin-tabs .admin-tab-btn.sub{font-size:12px;padding:6px 10px;}
 .pill-tab-btn{background:#fff;border:1px solid var(--sf-border);padding:6px 12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px;margin-bottom:6px;}
-.pill-tab-btn.active{background:var(--sf-red);color:#fff;border-color:var(--sf-red);}
+.pill-tab-btn.active{background:var(--info-blue);color:#fff;border-color:var(--info-blue);}
+.program-pills-wrap{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;background:var(--info-bg);padding:10px;border-radius:8px;border:1px solid #90CAF9;}
 .pill-tab-btn .pill-remove{display:inline-block;margin-left:6px;font-weight:900;opacity:.7;}
 .pill-tab-btn .pill-remove:hover{opacity:1;color:var(--fail-red);}
 .pill-add-btn{background:var(--sf-grey);border:1px dashed var(--sf-dark-grey);color:var(--sf-dark-grey);}
@@ -464,7 +470,7 @@ th.donts{background:#FFEBEE;color:#C62828;}
         <!-- TAB: Ngân hàng câu hỏi -->
         <div class="admin-panel" id="adminPanelQuestions">
           <!-- Tab con: chọn chương trình đào tạo đang quản lý ngân hàng câu hỏi -->
-          <div class="admin-tabs" id="qBankProgramTabs"></div>
+          <div class="program-pills-wrap" id="qBankProgramTabs"></div>
           <div class="admin-hint">Đang quản lý ngân hàng câu hỏi cho: <strong id="qBankProgramLabel">Kỹ Năng Mềm</strong>. Đáp án đúng chọn theo số thứ tự lựa chọn (1-6).</div>
           <div class="admin-status-msg" id="qMsg"></div>
           <div class="admin-row"><button type="button" class="btn-icon-only" id="btnExtractQuestions" title="Tải ngân hàng câu hỏi (Excel)">💾</button></div>
@@ -474,8 +480,14 @@ th.donts{background:#FFEBEE;color:#C62828;}
 
           <div class="admin-section-title">➕ Thêm 1 câu hỏi</div>
           <div class="admin-row">
-            <input type="number" id="newQModule" placeholder="Module (VD: 1)" style="max-width:100px;">
-            <input type="number" id="newQCorrect" placeholder="Đáp án đúng (1-6)" style="max-width:140px;">
+            <div class="labeled-field" style="max-width:100px;">
+              <label for="newQModule">Module</label>
+              <input type="number" id="newQModule" placeholder="VD: 1">
+            </div>
+            <div class="labeled-field" style="max-width:150px;">
+              <label for="newQCorrect">Đáp án đúng (1-6)</label>
+              <input type="number" id="newQCorrect" placeholder="VD: 2">
+            </div>
           </div>
           <div class="admin-row"><input type="text" id="newQQuestion" placeholder="Nội dung câu hỏi (Tiếng Việt)"></div>
           <div class="admin-row">
@@ -510,7 +522,7 @@ th.donts{background:#FFEBEE;color:#C62828;}
 
         <!-- TAB: Thiết lập chương trình học -->
         <div class="admin-panel" id="adminPanelContent">
-          <div class="admin-tabs" id="contentProgramTabs"></div>
+          <div class="program-pills-wrap" id="contentProgramTabs"></div>
           <div class="admin-hint">Đang thiết lập nội dung cho: <strong id="contentProgramLabel">Kỹ Năng Mềm</strong></div>
           <div class="admin-row" style="align-items:center;">
             <label style="font-size:13px;font-weight:700;">Trạng thái hiển thị trên menu:</label>
@@ -535,7 +547,10 @@ th.donts{background:#FFEBEE;color:#C62828;}
           <div id="moduleEditForm" style="display:none;">
             <div class="admin-section-title">✏️ Nội dung module</div>
             <div class="admin-row">
-              <input type="number" id="modOrder" placeholder="Thứ tự" style="max-width:90px;">
+              <div class="labeled-field" style="max-width:90px;">
+                <label for="modOrder">Thứ tự</label>
+                <input type="number" id="modOrder" placeholder="VD: 1">
+              </div>
               <label style="font-size:12.5px;font-weight:600;white-space:nowrap;">Màu nhấn:</label>
               <input type="color" id="modColor" value="#E11B22" style="width:46px;padding:2px;min-height:38px;flex:0;">
             </div>
@@ -1347,6 +1362,16 @@ function escUser(s){ // escape untrusted, user-typed form input before it is pla
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+// Nhấp nháy nổi bật 1 phần tử trong chốc lát — dùng để báo cho Admin biết rõ ràng bấm
+// "Sửa" ĐÃ có tác dụng (điền dữ liệu vào form), tránh nhầm tưởng nút không hoạt động khi
+// form nằm ở vị trí xa, ngoài tầm nhìn hiện tại trên màn hình.
+function flashHighlight(el){
+  if(!el) return;
+  el.classList.remove('flash-highlight');
+  void el.offsetWidth; // ép trình duyệt reflow để restart animation nếu bấm Sửa liên tiếp nhiều lần
+  el.classList.add('flash-highlight');
+  setTimeout(() => el.classList.remove('flash-highlight'), 1300);
 }
 /* ---------- RENDER MODULES ---------- */
 function renderModules(lang){
@@ -2675,6 +2700,8 @@ async function editModule(id){
   document.getElementById('modContentEn').value = m.content_html_en || '';
   document.getElementById('modContentZh').value = m.content_html_zh || '';
   switchModuleFormLang('vi');
+  document.getElementById('moduleEditForm').scrollIntoView({behavior:'smooth', block:'start'});
+  flashHighlight(document.getElementById('moduleEditForm'));
   await loadFlashcardsAdmin(id);
 }
 async function saveModule(){
@@ -2991,6 +3018,10 @@ function editEmployee(id){
   document.getElementById('newEmpDownload').checked = !!e.can_download_reports;
   document.getElementById('btnAddEmployee').textContent = '✓';
   document.getElementById('btnAddEmployee').title = 'Cập nhật nhân viên';
+  const nameField = document.getElementById('newEmpName');
+  nameField.scrollIntoView({behavior:'smooth', block:'center'});
+  flashHighlight(nameField);
+  flashHighlight(document.getElementById('btnAddEmployee'));
 }
 function clearEmployeeForm(){
   editingEmployeeId = null;
@@ -3120,6 +3151,12 @@ function editQuestion(id){
   document.getElementById('newQOpt5').value = q.option5_vi || '';
   document.getElementById('newQOpt6').value = q.option6_vi || '';
   document.getElementById('btnAddQuestion').textContent = 'Cập nhật câu hỏi này';
+  // Form "Thêm 1 câu hỏi" nằm khá xa phía dưới bảng — cuộn tới + nhấp nháy để người dùng
+  // thấy rõ ngay là dữ liệu đã được điền vào (tránh tưởng nhầm là nút Sửa không hoạt động).
+  const questionField = document.getElementById('newQQuestion');
+  questionField.scrollIntoView({behavior:'smooth', block:'center'});
+  flashHighlight(questionField);
+  flashHighlight(document.getElementById('btnAddQuestion'));
 }
 function clearQuestionForm(){
   editingQuestionId = null;
