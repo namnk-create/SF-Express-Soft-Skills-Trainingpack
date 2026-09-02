@@ -1863,12 +1863,31 @@ async function loadProgramConfigPublic(){
 /* ================================================================
    ===== EXTRACT DATA → EXCEL (dùng chung cho NV có quyền & Admin) =====
    ================================================================ */
+// Chuyển ISO timestamp (UTC, có hậu tố Z) sang giờ Việt Nam (UTC+7), định dạng
+// dd/mm/yyyy hh:mm:ss dễ đọc trong Excel thay vì chuỗi "2026-09-02T02:51:03.708Z".
+function toVNTimeString(isoStr){
+  if(!isoStr) return '';
+  const d = new Date(isoStr);
+  if(isNaN(d.getTime())) return isoStr;
+  const vn = new Date(d.getTime() + 7*60*60*1000); // UTC+7
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(vn.getUTCDate())}/${pad(vn.getUTCMonth()+1)}/${vn.getUTCFullYear()} ${pad(vn.getUTCHours())}:${pad(vn.getUTCMinutes())}:${pad(vn.getUTCSeconds())}`;
+}
+// Rút gọn module_scores {"1":{correct,total},...} thành 1 dòng dễ đọc, VD: "M1: 2/4 | M2: 1/3"
+function moduleScoresToText(moduleScores){
+  if(!moduleScores || typeof moduleScores !== 'object') return '';
+  return Object.keys(moduleScores)
+    .sort((a,b) => Number(a) - Number(b))
+    .map(k => `M${k}: ${moduleScores[k].correct ?? 0}/${moduleScores[k].total ?? 0}`)
+    .join(' | ');
+}
 function buildAndDownloadExcel(rows, filename){
   if(!rows || !rows.length){
     alert('Không có dữ liệu để xuất.');
     return;
   }
-  const flatRows = rows.map(r => ({
+  // Sheet 1: tóm tắt kết quả mỗi lượt nộp bài (1 dòng / 1 người).
+  const summaryRows = rows.map(r => ({
     'Tên NV': r.name,
     'Mã NV': r.employee_id,
     'Ngôn ngữ': r.language,
@@ -1877,13 +1896,35 @@ function buildAndDownloadExcel(rows, filename){
     '% Đúng': r.percentage,
     'Kết quả': r.passed ? 'Đạt' : 'Không đạt',
     'Đánh giá (1-10)': r.rating,
-    'Thời gian nộp (server)': r.submitted_at,
-    'Thời gian nộp (máy NV)': r.client_submitted_at,
-    'Chi tiết theo module (JSON)': JSON.stringify(r.module_scores || {}),
+    'Thời gian nộp (giờ VN)': toVNTimeString(r.submitted_at),
+    'Kết quả theo module': moduleScoresToText(r.module_scores),
   }));
-  const ws = XLSX.utils.json_to_sheet(flatRows);
+  // Sheet 2: chi tiết TỪNG CÂU HỎI của TỪNG người — vì mỗi lượt làm bài rút ngẫu nhiên
+  // câu hỏi khác nhau, phải đi kèm nguyên văn câu hỏi mới biết "câu số mấy" là câu nào.
+  const detailRows = [];
+  rows.forEach(r => {
+    const questions = Array.isArray(r.questions) ? r.questions : [];
+    questions.forEach((q, idx) => {
+      detailRows.push({
+        'Tên NV': r.name,
+        'Mã NV': r.employee_id,
+        'Thời gian nộp (giờ VN)': toVNTimeString(r.submitted_at),
+        'Câu số': idx + 1,
+        'Module': q.module,
+        'Nội dung câu hỏi': q.question,
+        'Đáp án đã chọn': q.selectedText || '(chưa chọn)',
+        'Đáp án đúng': q.correctText,
+        'Kết quả': q.isCorrect ? 'Đúng' : 'Sai',
+      });
+    });
+  });
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'KetQua');
+  const ws1 = XLSX.utils.json_to_sheet(summaryRows);
+  XLSX.utils.book_append_sheet(wb, ws1, 'KetQua');
+  if(detailRows.length){
+    const ws2 = XLSX.utils.json_to_sheet(detailRows);
+    XLSX.utils.book_append_sheet(wb, ws2, 'ChiTietCauTraLoi');
+  }
   XLSX.writeFile(wb, filename);
 }
 async function extractData(){
