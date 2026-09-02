@@ -439,7 +439,8 @@ th.donts{background:#FFEBEE;color:#C62828;}
         </div>
 
         <div class="admin-tabs">
-          <button type="button" class="admin-tab-btn active" data-tab="employees">👤 Nhân viên</button>
+          <button type="button" class="admin-tab-btn active" data-tab="general">📊 Tổng quan</button>
+          <button type="button" class="admin-tab-btn" data-tab="employees">👤 Nhân viên</button>
           <button type="button" class="admin-tab-btn" data-tab="questions">❓ Ngân hàng câu hỏi</button>
           <button type="button" class="admin-tab-btn" data-tab="content">📚 Thiết lập chương trình học</button>
           <button type="button" class="admin-tab-btn" data-tab="config">⚙️ Cấu hình bài thi</button>
@@ -449,17 +450,59 @@ th.donts{background:#FFEBEE;color:#C62828;}
         </div>
 
         <!-- TAB: Nhân viên -->
-        <div class="admin-panel active" id="adminPanelEmployees">
-          <div class="admin-hint">Chỉ nhân viên có trong danh sách này mới vào được trang web (xác thực bằng đúng Tên + Mã NV). Bật "Tải báo cáo" để nhân viên đó thấy nút Extract Data ở trang thống kê.</div>
+        <!-- TAB: Tổng quan (Dashboard) -->
+        <div class="admin-panel active" id="adminPanelGeneral">
+          <div class="admin-row" style="align-items:center;">
+            <label style="font-size:13px;font-weight:700;white-space:nowrap;">Khoảng thời gian:</label>
+            <select id="dashPeriodSelect" style="max-width:180px;">
+              <option value="all">Toàn bộ thời gian</option>
+              <option value="month">Tháng này</option>
+              <option value="quarter">Quý này</option>
+              <option value="custom">Tùy chỉnh</option>
+            </select>
+            <input type="date" id="dashFrom" style="display:none;max-width:150px;">
+            <input type="date" id="dashTo" style="display:none;max-width:150px;">
+            <button type="button" class="btn-secondary" id="btnDashRefresh" style="padding:8px 14px;font-size:12.5px;">Xem</button>
+          </div>
+          <div class="admin-status-msg" id="dashMsg"></div>
+
+          <div class="admin-section-title">👤 Nhân viên</div>
+          <div id="dashEmpSummary" class="admin-hint">Đang tải...</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <div style="font-size:12px;font-weight:700;color:var(--sf-dark-grey);margin-bottom:6px;">Theo kho</div>
+              <table class="admin-table"><thead><tr><th>Kho</th><th>Số lượng</th></tr></thead><tbody id="dashWarehouseBody"></tbody></table>
+            </div>
+            <div style="flex:1;min-width:200px;">
+              <div style="font-size:12px;font-weight:700;color:var(--sf-dark-grey);margin-bottom:6px;">Theo chức danh</div>
+              <table class="admin-table"><thead><tr><th>Chức danh</th><th>Số lượng</th></tr></thead><tbody id="dashTitleBody"></tbody></table>
+            </div>
+          </div>
+
+          <div class="admin-section-title">🎓 Chương trình đào tạo</div>
+          <table class="admin-table"><thead><tr>
+            <th>Chương trình</th><th>Trạng thái</th><th>Module</th><th>Câu hỏi</th><th>Đối tượng</th><th>Đủ điều kiện</th><th>Đã đạt</th><th>% Hoàn thành</th>
+          </tr></thead><tbody id="dashProgramsBody"></tbody></table>
+
+          <div class="admin-section-title">📢 Thông báo & Bài test định kỳ</div>
+          <div id="dashAnnPtSummary" class="admin-hint">Đang tải...</div>
+        </div>
+
+        <div class="admin-panel" id="adminPanelEmployees">
+          <div class="admin-hint">Chỉ nhân viên có trong danh sách này mới vào được trang web (xác thực bằng đúng Tên + Mã NV). Bật "Tải báo cáo" để nhân viên đó thấy nút Extract Data ở trang thống kê. Chức danh dùng để gán đối tượng bắt buộc hoàn thành chương trình/thông báo/bài test và thống kê ở tab Tổng quan.</div>
           <div class="admin-status-msg" id="empMsg"></div>
           <div class="admin-row"><button type="button" class="btn-icon-only" id="btnExtractEmployees" title="Tải danh sách NV (Excel)">💾</button></div>
           <table class="admin-table"><thead><tr>
-            <th>Tên NV</th><th>Mã NV</th><th>Mã kho</th><th>Tải báo cáo</th><th></th>
+            <th>Tên NV</th><th>Mã NV</th><th>Mã kho</th><th>Chức danh</th><th>Tải báo cáo</th><th></th>
           </tr></thead><tbody id="empTableBody"></tbody></table>
           <div class="admin-row">
             <input type="text" id="newEmpName" placeholder="Tên NV">
             <input type="text" id="newEmpId" placeholder="Mã NV">
             <input type="text" id="newEmpWarehouse" placeholder="Mã kho (tùy chọn)">
+            <input type="text" id="newEmpTitle" placeholder="Chức danh (VD: BA, VAN, WA, SSM)" list="empTitleOptions">
+            <datalist id="empTitleOptions">
+              <option value="BA"><option value="VAN"><option value="WA"><option value="SSM">
+            </datalist>
             <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;flex:0;white-space:nowrap;">
               <input type="checkbox" id="newEmpDownload" style="flex:0;min-height:auto;width:auto;"> Tải báo cáo
             </label>
@@ -471,7 +514,7 @@ th.donts{background:#FFEBEE;color:#C62828;}
         <div class="admin-panel" id="adminPanelQuestions">
           <!-- Tab con: chọn chương trình đào tạo đang quản lý ngân hàng câu hỏi -->
           <div class="program-pills-wrap" id="qBankProgramTabs"></div>
-          <div class="admin-hint">Đang quản lý ngân hàng câu hỏi cho: <strong id="qBankProgramLabel">Kỹ Năng Mềm</strong>. Đáp án đúng chọn theo số thứ tự lựa chọn (1-6).</div>
+          <div class="admin-hint">Đang quản lý ngân hàng câu hỏi cho: <strong id="qBankProgramLabel">Kỹ Năng Mềm</strong> — <strong id="qBankCount">0</strong> câu hỏi. Đáp án đúng chọn theo số thứ tự lựa chọn (1-6).</div>
           <div class="admin-status-msg" id="qMsg"></div>
           <div class="admin-row"><button type="button" class="btn-icon-only" id="btnExtractQuestions" title="Tải ngân hàng câu hỏi (Excel)">💾</button></div>
           <table class="admin-table"><thead><tr>
@@ -615,6 +658,16 @@ th.donts{background:#FFEBEE;color:#C62828;}
           <div class="admin-row"><label style="min-width:180px;font-size:13px;font-weight:700;">Số câu / bài thi</label><input type="number" id="cfgQuestionsPerQuiz"></div>
           <div class="admin-row"><label style="min-width:180px;font-size:13px;font-weight:700;">Điểm đậu (số câu đúng)</label><input type="number" id="cfgPassScore"></div>
           <div class="admin-row"><label style="min-width:180px;font-size:13px;font-weight:700;">Thời gian làm bài (phút)</label><input type="number" id="cfgTimeLimit"></div>
+          <div class="admin-row" style="align-items:flex-start;">
+            <label style="min-width:180px;font-size:13px;font-weight:700;padding-top:8px;">Đối tượng bắt buộc hoàn thành</label>
+            <div id="cfgRequiredTitlesWrap" style="display:flex;flex-wrap:wrap;gap:10px;flex:1;">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;flex:0;white-space:nowrap;"><input type="checkbox" class="cfg-title-chk" value="BA" style="flex:0;width:auto;min-height:auto;"> BA</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;flex:0;white-space:nowrap;"><input type="checkbox" class="cfg-title-chk" value="VAN" style="flex:0;width:auto;min-height:auto;"> VAN</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;flex:0;white-space:nowrap;"><input type="checkbox" class="cfg-title-chk" value="WA" style="flex:0;width:auto;min-height:auto;"> WA</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;flex:0;white-space:nowrap;"><input type="checkbox" class="cfg-title-chk" value="SSM" style="flex:0;width:auto;min-height:auto;"> SSM</label>
+            </div>
+          </div>
+          <div class="admin-hint">Không chọn chức danh nào = áp dụng cho TẤT CẢ nhân viên. Dùng để tính % hoàn thành ở tab "📊 Tổng quan".</div>
           <div class="admin-row"><button type="button" class="btn-secondary" id="btnSaveConfig">Lưu cấu hình</button></div>
         </div>
 
@@ -2467,6 +2520,7 @@ async function changePassword(){
    ================================================================ */
 function switchAdminTab(tabName){
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+  document.getElementById('adminPanelGeneral').classList.toggle('active', tabName === 'general');
   document.getElementById('adminPanelEmployees').classList.toggle('active', tabName === 'employees');
   document.getElementById('adminPanelQuestions').classList.toggle('active', tabName === 'questions');
   document.getElementById('adminPanelContent').classList.toggle('active', tabName === 'content');
@@ -2485,6 +2539,90 @@ async function loadAdminDashboardData(){
   loadStorageInfo();
   loadAnnouncementsAdmin();
   loadPeriodicTestsAdmin();
+  loadDashboardStats();
+}
+/* ================================================================
+   ===== ADMIN: TAB "📊 TỔNG QUAN" (DASHBOARD) =====
+   ================================================================ */
+function getPeriodRange(period){
+  const now = new Date();
+  if(period === 'month'){
+    const from = new Date(now.getFullYear(), now.getMonth(), 1);
+    const to = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  if(period === 'quarter'){
+    const q = Math.floor(now.getMonth()/3);
+    const from = new Date(now.getFullYear(), q*3, 1);
+    const to = new Date(now.getFullYear(), q*3+3, 0, 23,59,59);
+    return { from: from.toISOString(), to: to.toISOString() };
+  }
+  return { from: null, to: null };
+}
+function dateInputToISO(value, endOfDay){
+  if(!value) return null;
+  const d = new Date(value + (endOfDay ? 'T23:59:59' : 'T00:00:00'));
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+async function loadDashboardStats(){
+  const msgEl = document.getElementById('dashMsg');
+  msgEl.textContent = '';
+  const period = document.getElementById('dashPeriodSelect').value;
+  let from = null, to = null;
+  if(period === 'custom'){
+    from = dateInputToISO(document.getElementById('dashFrom').value, false);
+    to = dateInputToISO(document.getElementById('dashTo').value, true);
+  } else if(period !== 'all'){
+    const range = getPeriodRange(period);
+    from = range.from; to = range.to;
+  }
+  const token = adminToken();
+  try{
+    const params = new URLSearchParams();
+    if(from) params.set('from', from);
+    if(to) params.set('to', to);
+    const res = await fetch(`${WORKER_BASE_URL}/api/admin/dashboard-stats?${params.toString()}`, { headers: {'Authorization': 'Bearer ' + token} });
+    const data = await res.json();
+    if(!res.ok){ msgEl.textContent = data.error || 'Có lỗi xảy ra.'; msgEl.style.color = 'var(--fail-red)'; return; }
+    renderDashboardStats(data);
+  }catch(err){
+    console.error('Lỗi tải thống kê tổng quan:', err);
+    msgEl.textContent = 'Không kết nối được máy chủ.';
+    msgEl.style.color = 'var(--fail-red)';
+  }
+}
+function renderDashboardStats(data){
+  document.getElementById('dashEmpSummary').textContent = `Tổng cộng: ${data.employees.total} nhân viên.`;
+
+  const whBody = document.getElementById('dashWarehouseBody');
+  whBody.innerHTML = '';
+  Object.entries(data.employees.byWarehouse).forEach(([wh, count]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escUser(wh)}</td><td>${count}</td>`;
+    whBody.appendChild(tr);
+  });
+
+  const titleBody = document.getElementById('dashTitleBody');
+  titleBody.innerHTML = '';
+  Object.entries(data.employees.byTitle).forEach(([t, count]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escUser(t)}</td><td>${count}</td>`;
+    titleBody.appendChild(tr);
+  });
+
+  const progBody = document.getElementById('dashProgramsBody');
+  progBody.innerHTML = '';
+  data.programs.forEach(p => {
+    const tr = document.createElement('tr');
+    const statusText = p.status === 'live' ? '✅ Live' : '🔜 Sắp có';
+    const audienceText = p.requiredTitles.length ? p.requiredTitles.join(', ') : 'Tất cả NV';
+    const pctText = p.completionPct === null ? '—' : p.completionPct + '%';
+    tr.innerHTML = `<td>${escUser(p.programName)}</td><td>${statusText}</td><td>${p.moduleCount}</td><td>${p.questionCount}</td><td>${escUser(audienceText)}</td><td>${p.eligibleCount}</td><td>${p.passedCount}</td><td>${pctText}</td>`;
+    progBody.appendChild(tr);
+  });
+
+  document.getElementById('dashAnnPtSummary').textContent =
+    `📢 Thông báo: ${data.announcementsCount} | 📅 Bài test định kỳ: ${data.periodicTestsCount} (trong khoảng thời gian đã chọn).`;
 }
 // Tải danh sách chương trình thật từ D1 (bảng program_config) — thay cho danh sách cứng
 // trước đây, để phản ánh đúng những chương trình Admin đã tự thêm/xóa.
@@ -2998,7 +3136,7 @@ function renderEmployeesTable(){
   tbody.innerHTML = '';
   employeesCache.forEach(e => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${escUser(e.name)}</td><td>${escUser(e.employee_id)}</td><td>${escUser(e.warehouse_code||'')}</td><td>${e.can_download_reports ? '✅' : '—'}</td>
+    tr.innerHTML = `<td>${escUser(e.name)}</td><td>${escUser(e.employee_id)}</td><td>${escUser(e.warehouse_code||'')}</td><td>${escUser(e.title||'')}</td><td>${e.can_download_reports ? '✅' : '—'}</td>
       <td style="white-space:nowrap;">
         <button type="button" class="icon-btn-edit" data-emp-edit="${e.id}" title="Sửa">✏️</button>
         <button type="button" class="icon-btn-del" data-emp-del="${e.id}" title="Xóa">🗑️</button>
@@ -3015,6 +3153,7 @@ function editEmployee(id){
   document.getElementById('newEmpName').value = e.name;
   document.getElementById('newEmpId').value = e.employee_id;
   document.getElementById('newEmpWarehouse').value = e.warehouse_code || '';
+  document.getElementById('newEmpTitle').value = e.title || '';
   document.getElementById('newEmpDownload').checked = !!e.can_download_reports;
   document.getElementById('btnAddEmployee').textContent = '✓';
   document.getElementById('btnAddEmployee').title = 'Cập nhật nhân viên';
@@ -3028,6 +3167,7 @@ function clearEmployeeForm(){
   document.getElementById('newEmpName').value = '';
   document.getElementById('newEmpId').value = '';
   document.getElementById('newEmpWarehouse').value = '';
+  document.getElementById('newEmpTitle').value = '';
   document.getElementById('newEmpDownload').checked = false;
   document.getElementById('btnAddEmployee').textContent = '+';
   document.getElementById('btnAddEmployee').title = 'Thêm nhân viên';
@@ -3036,6 +3176,7 @@ async function saveEmployee(){
   const name = document.getElementById('newEmpName').value.trim();
   const employeeId = document.getElementById('newEmpId').value.trim();
   const warehouseCode = document.getElementById('newEmpWarehouse').value.trim();
+  const title = document.getElementById('newEmpTitle').value.trim();
   const canDownloadReports = document.getElementById('newEmpDownload').checked;
   const msgEl = document.getElementById('empMsg');
   msgEl.textContent = '';
@@ -3046,12 +3187,12 @@ async function saveEmployee(){
     if(editingEmployeeId){
       res = await fetch(`${WORKER_BASE_URL}/api/admin/employees`, {
         method: 'PUT', headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
-        body: JSON.stringify({ id: editingEmployeeId, name, employeeId, warehouseCode, canDownloadReports })
+        body: JSON.stringify({ id: editingEmployeeId, name, employeeId, warehouseCode, title, canDownloadReports })
       });
     } else {
       res = await fetch(`${WORKER_BASE_URL}/api/admin/employees`, {
         method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
-        body: JSON.stringify({ name, employeeId, warehouseCode, canDownloadReports })
+        body: JSON.stringify({ name, employeeId, warehouseCode, title, canDownloadReports })
       });
     }
     const data = await res.json();
@@ -3123,6 +3264,7 @@ async function loadQuestionsAdmin(){
 function renderQuestionsTable(){
   const tbody = document.getElementById('qTableBody');
   tbody.innerHTML = '';
+  document.getElementById('qBankCount').textContent = questionsCache.length;
   questionsCache.forEach(q => {
     const tr = document.createElement('tr');
     const full = q.question_vi || '';
@@ -3322,18 +3464,23 @@ async function loadProgramConfigAdmin(){
     document.getElementById('cfgQuestionsPerQuiz').value = cfg.questions_per_quiz || 20;
     document.getElementById('cfgPassScore').value = cfg.pass_score || 16;
     document.getElementById('cfgTimeLimit').value = cfg.time_limit_minutes || 20;
+    let requiredTitles = [];
+    try{ requiredTitles = JSON.parse(cfg.required_titles || '[]'); }catch(e){ requiredTitles = []; }
+    document.querySelectorAll('.cfg-title-chk').forEach(chk => { chk.checked = requiredTitles.includes(chk.value); });
   }catch(err){ console.error('Lỗi tải cấu hình chương trình:', err); }
 }
 async function saveProgramConfigAdmin(){
   const msgEl = document.getElementById('cfgMsg');
   msgEl.textContent = '';
   const token = adminToken();
+  const requiredTitles = [...document.querySelectorAll('.cfg-title-chk:checked')].map(chk => chk.value);
   const body = {
     programId: currentAdminProgramId,
     programName: programName(currentAdminProgramId),
     questionsPerQuiz: parseInt(document.getElementById('cfgQuestionsPerQuiz').value, 10) || 20,
     passScore: parseInt(document.getElementById('cfgPassScore').value, 10) || 16,
     timeLimitMinutes: parseInt(document.getElementById('cfgTimeLimit').value, 10) || 20,
+    requiredTitles,
   };
   try{
     const res = await fetch(`${WORKER_BASE_URL}/api/admin/program-config`, {
@@ -3488,6 +3635,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('menuPeriodicTestsHeader').addEventListener('click', (e) => { e.stopPropagation(); toggleMenuAccordion('menuPeriodicTestsHeader','menuPeriodicTestsBody'); });
   document.getElementById('btnAddAnnouncement').addEventListener('click', addAnnouncement);
   document.getElementById('btnAddPeriodicTest').addEventListener('click', addPeriodicTest);
+  document.getElementById('dashPeriodSelect').addEventListener('change', () => {
+    const isCustom = document.getElementById('dashPeriodSelect').value === 'custom';
+    document.getElementById('dashFrom').style.display = isCustom ? 'inline-block' : 'none';
+    document.getElementById('dashTo').style.display = isCustom ? 'inline-block' : 'none';
+  });
+  document.getElementById('btnDashRefresh').addEventListener('click', loadDashboardStats);
   document.getElementById('btnCloseAdmin').addEventListener('click', closeAdminModal);
 
   // ----- Admin: đăng nhập / quên mật khẩu / đổi mật khẩu -----
